@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using testLethalCompany.myPatches;
 
 namespace forLearning
 {
@@ -33,7 +34,8 @@ namespace forLearning
 
             mls.LogInfo("The test mod has awaken!!!!!");
 
-            harmony.PatchAll();
+            harmony.PatchAll(typeof(learningClass));
+            harmony.PatchAll(typeof(playerControllerBPatch));
 
 
         }
