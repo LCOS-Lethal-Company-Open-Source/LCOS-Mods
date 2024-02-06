@@ -33,6 +33,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet run --project ../Postbuild -- --dev $(TargetDir) $(ProjectDir) --run" />
+    <Exec Command="dotnet run --project ../Postbuild -- --dev &quot;$(TargetDir)\&quot; &quot;$(ProjectDir)\&quot; --run" />
   </Target>
 </Project>
