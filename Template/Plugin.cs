@@ -9,5 +9,10 @@ public class Plugin : BaseUnityPlugin
         // Plugin load logic goes here!
         // This script acts like a unity object.
         Logger.LogInfo($"Hello World!");
+
+        Logger.LogInfo($"Hello World!");
+        Logger.LogInfo($"Hello World!");
+        Logger.LogInfo($"Hello World!");
+
     }
 }
