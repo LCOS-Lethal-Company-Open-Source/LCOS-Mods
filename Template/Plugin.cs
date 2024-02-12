@@ -1,5 +1,7 @@
 ﻿using BepInEx;
+using HarmonyLib;
 namespace Template;
+using Template.obj.
 
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
@@ -10,9 +12,10 @@ public class Plugin : BaseUnityPlugin
         // This script acts like a unity object.
         Logger.LogInfo($"Hello World!");
 
-        Logger.LogInfo($"Hello World!");
-        Logger.LogInfo($"Hello World!");
-        Logger.LogInfo($"Hello World!");
-
+        [HarmonyPatch("Update")]
+        [HarmonyPostfix]
+        static void infiniteSprint(ref float __sprintMeter){
+            __sprintMeter = 1;
+        }
     }
 }
