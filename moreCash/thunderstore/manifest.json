@@ -1,0 +1,9 @@
+{
+    "name": "moreCash",
+    "version_number": "0.0.1",
+    "website_url": "https://github.com/LCOS-Lethal-Company-Open-Source/LCOS-Mods",
+    "description": "Gives your team 1000 credits at the beginning of a run.",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100"
+    ]
+}
