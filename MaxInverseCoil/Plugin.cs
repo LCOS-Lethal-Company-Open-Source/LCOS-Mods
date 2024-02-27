@@ -30,12 +30,14 @@ public class Plugin : BaseUnityPlugin
         {
             foreach (CodeInstruction instruction in instructions) 
             {
-                if (instruction.opcode == OpCodes.Ldfld && instruction.operand.Equals(typeof(SpringManAI).GetField("currentChaseSpeed")))
+                if (instruction.opcode == OpCodes.Ldfld && instruction.operand.Equals(typeof(SpringManAI).GetField("currentChaseSpeed", 
+                                                                                                                    BindingFlags.NonPublic | 
+                                                                                                                    BindingFlags.Instance)))
                 {
-                    instruction.opcode = OpCodes.Ldc_R4;
-                    instruction.operand = 0.0f;
+                    yield return new CodeInstruction(OpCodes.Pop);
+                    yield return new CodeInstruction(OpCodes.Ldc_R4, 12.0f);
                 }
-                yield return instruction; 
+                else yield return instruction; 
                 if (instruction.opcode == OpCodes.Blt) 
                 {
                     yield return new CodeInstruction(OpCodes.Ldloc_1);
