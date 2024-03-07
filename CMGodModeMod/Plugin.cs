@@ -37,6 +37,19 @@ namespace CMGodModeMod
             harmony.PatchAll(typeof(GodModeModBase));
             harmony.PatchAll(typeof(PlayerControllerBPatch));
             harmony.PatchAll(typeof(QuotaSettingsPatch));
+            harmony.PatchAll(typeof(infiniteTimeToDeadline));
         }
+
+        [HarmonyPatch(typeof(TimeOfDay), "Awake")]
+
+        class infiniteTimeToDeadline
+        {
+            private static void Postfix(ref TimeOfDay __instance)
+            {
+                int AmountOfDaysLeft = 999999;
+                __instance.quotaVariables.deadlineDaysAmount = AmountOfDaysLeft;
+            }
+        }
+
     }
 }
