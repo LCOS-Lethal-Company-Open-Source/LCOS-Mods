@@ -1,8 +1,8 @@
 {
-    "name": "Template Mod",
-    "version_number": "0.0.1",
+    "name": "God Mode Mod",
+    "version_number": "1.1.0",
     "website_url": "https://github.com/LCOS-Lethal-Company-Open-Source/LCOS-Mods",
-    "description": "A template mod",
+    "description": "This mod adds in God Mode abilities to the game. This includes infinte sprinting, higher jumping, infinite number of days to the deadline, ultimited starting credit, and unlimited health.",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100"
     ]
