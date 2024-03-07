@@ -15,7 +15,7 @@ namespace CMGodModeMod
     {
         private const string modGUID = "Christianm.CMGodModeMod";
         private const string modName = "God Mode Mod";
-        private const string modVersion = "1.0.0.0";
+        private const string modVersion = "1.1.0.0";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
