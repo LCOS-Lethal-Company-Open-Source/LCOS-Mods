@@ -15,20 +15,17 @@ public class Plugin : BaseUnityPlugin
     {
         // Plugin load logic goes here!
         // This script acts like a unity object.
-        Logger.LogInfo($"What up gamers");
+        Logger.LogInfo($"Keep Inventory Active");
         harmony.PatchAll();
 
     }
 
-    //[HarmonyPatch(typeof(PlayerControllerB), "FallValue")]
-    [HarmonyPatch(typeof(PlayerControllerB), "PlayerJump")]
+    [HarmonyPatch(typeof(PlayerControllerB), "DropAllHeldItems")]
     class Patch
     {
         static bool Prefix(ref PlayerControllerB __instance)
         {
-            __instance.jumpForce = 17f;
-            __instance.DropAllHeldItems();
-            return true;
+            return false;
         }
     }  
 }
