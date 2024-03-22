@@ -8,7 +8,7 @@ This mod adds God Mode features to the game. These features include:
 - higher jumping
 - invincibility
 
-This mod is still a work-in-progress mod
+This mod is still a work-in-progress mod!
 
 Created by Christian Marinkovich
 
