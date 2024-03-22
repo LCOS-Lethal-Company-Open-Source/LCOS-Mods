@@ -15,17 +15,18 @@ public class Plugin : BaseUnityPlugin
     {
         // Plugin load logic goes here!
         // This script acts like a unity object.
-        Logger.LogInfo($"Keep Inventory Active");
+        Logger.LogInfo($"Fly mod active");
         harmony.PatchAll();
 
     }
 
-    [HarmonyPatch(typeof(PlayerControllerB), "DropAllHeldItems")]
+    [HarmonyPatch(typeof(PlayerControllerB), "PlayerJump")]
     class Patch
     {
-        static bool Prefix(ref PlayerControllerB __instance)
-        {
-            return false;
+        static bool Postfix(ref PlayerControllerB __instance)
+        {   
+            __instance.fallValue = 0;
+            return true;
         }
     }  
 }
