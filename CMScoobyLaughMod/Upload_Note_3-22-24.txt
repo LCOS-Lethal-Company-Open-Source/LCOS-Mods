@@ -1,0 +1,4 @@
+This is a note saying that I have uploaded this mod to ThunderStore in 3/22/24.
+
+Instructions link (Approx time 30-40 minutes):
+https://github.com/LCOS-Lethal-Company-Open-Source/Project-Documentation/blob/main/Mod-Uploading

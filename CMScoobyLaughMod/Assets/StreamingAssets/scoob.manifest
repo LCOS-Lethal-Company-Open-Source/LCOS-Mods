@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 3177294375
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 803013c69e9a2005b646a33eb66527a7
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9a2ca7bdbd1871f7131daf57de908e0c
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 803013c69e9a2005b646a33eb66527a7
+HashAppended: 0
+ClassTypes:
+- Class: 83
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Scooby_Laugh_Sound.wav
+Dependencies: []
