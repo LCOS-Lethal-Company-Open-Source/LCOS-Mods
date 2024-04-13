@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 892024139
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: scoob
+      Dependencies: {}
