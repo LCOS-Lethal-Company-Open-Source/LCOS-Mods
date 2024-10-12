@@ -1,0 +1,9 @@
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\bin\Debug\netstandard2.1\tester.testmod1.deps.json
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\bin\Debug\netstandard2.1\tester.testmod1.dll
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\testmod1.csproj.AssemblyReference.cache
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\MyPluginInfo.cs
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\testmod1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\testmod1.AssemblyInfoInputs.cache
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\testmod1.AssemblyInfo.cs
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\testmod1.csproj.CoreCompileInputs.cache
+C:\Users\barra2\Documents\Lethal Company Mods\testmod1\obj\Debug\netstandard2.1\tester.testmod1.dll
