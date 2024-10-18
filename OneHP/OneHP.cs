@@ -1,18 +1,12 @@
-//using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
-//using LobbyCompatibility.Attributes;
-//using LobbyCompatibility.Enums;
-//using UnityEngine.PlayerLoop;
 
 namespace OneHP;
 
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-//[BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.HardDependency)]
-//[LobbyCompatibility(CompatibilityLevel.ClientOnly, VersionStrictness.None)]
 public class OneHP : BaseUnityPlugin
 {
     public static OneHP Instance { get; private set; } = null!;
@@ -24,33 +18,33 @@ public class OneHP : BaseUnityPlugin
         Logger = base.Logger;
         Instance = this;
 
-        ElmHarmony.PatchAll(typeof(OneHP));
-        ElmHarmony.PatchAll(typeof(noMoreRegen));
-        ElmHarmony.PatchAll(typeof(noMoreHealth));
+        ElmHarmony.PatchAll(typeof(HealthEditing));
 
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
     }
-
-    [HarmonyPatch(typeof(PlayerControllerB))]
-    internal class noMoreRegen()
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch("LateUpdatePatch")]
-        internal static void noMoreHealthRegen(ref float __healthRegenerateTimer){
-            __healthRegenerateTimer = 9999f;
-            Logger.LogInfo($"No Regen for you");
-        }
-    }
-
-    [HarmonyPatch(typeof(StartOfRound))]
-    internal class noMoreHealth()
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch("ReviveDeadPlayers")]
-
-        internal static void setHealthToOne(ref int __health){
-            __health = 1;
-            Logger.LogInfo($"No health for you");
-        }
-    }
 }
+
+class HealthEditing
+{
+    [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
+    [HarmonyPrefix]
+
+        static void infiniteCooldown(PlayerControllerB __instance){
+            __instance.healthRegenerateTimer = 9999f;
+
+        }
+
+    [HarmonyPatch(typeof(StartOfRound), "ReviveDeadPlayers")]
+    [HarmonyPostfix]
+        static void startAt1(PlayerControllerB __instance){
+            __instance.health = 1;
+        }
+
+    [HarmonyPatch(typeof(PlayerControllerB), "Update")]
+    [HarmonyPostfix]
+        static void keepSettingTo1(PlayerControllerB __instance){
+            __instance.health = 1;
+        }
+}
+
+

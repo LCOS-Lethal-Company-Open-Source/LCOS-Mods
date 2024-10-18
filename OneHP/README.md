@@ -1,5 +1,3 @@
-# Super Dumb HP mod
+# OneHP Mod
 
-Caps your HP to 1, and prevents any health regeneration.
-
-Probably doesn't work.
+Very Simple Mod That Keeps you at OneHP
