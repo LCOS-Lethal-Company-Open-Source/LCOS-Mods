@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BepInEx.Configuration;
+using RandomCompany.Patches;
 
 namespace RandomCompany
 {
@@ -26,7 +28,10 @@ namespace RandomCompany
         private readonly Harmony harmony = new Harmony(modGUID);
 
         private static RandomCompany instance;
+        private RoundManagerPatch rmp;
+        private PlayerControllerBPatch pcbp;
 
+        internal static Config cfg { get; private set; } = null;
         internal ManualLogSource mls;
 
         void Awake()
@@ -35,12 +40,20 @@ namespace RandomCompany
             {
                 instance = this;
             }
+            cfg = new Config(base.Config);
+
+            rmp = new RoundManagerPatch();
+            pcbp = new PlayerControllerBPatch();
+
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
             mls.LogInfo(modName + " has started");
 
             harmony.PatchAll();
+
+            
+
         }
         public static void logMessage(string message)
         {
