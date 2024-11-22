@@ -89,7 +89,7 @@ public class BoonsAndBanes : BaseUnityPlugin
 public class TerminalCommandFunctions(){
     int ScrapMultiplier = 1;
     string[] boonNames = ["ExtraLife"];
-    string[] baneNames = ["HalfHealth", "OopsItsAllX"];
+    string[] baneNames = ["HalfHealth", "OopsItsAllX", "FasterDayCycle"];
     string[] cheatNames = ["DoubleSellValue"];
     public int getMultiplier(){
         return ScrapMultiplier;
@@ -101,8 +101,20 @@ public class TerminalCommandFunctions(){
         StartOfRound.Instance.companyBuyingRate *= 2;
     }
 
-    static void halfMaxHealth(){
-        
+
+    [HarmonyPatch(typeof(PlayerControllerB), "Update")]
+    [HarmonyPostfix]
+    static void halfMaxHealth(PlayerControllerB __instance){
+            if (__instance.health > 50){
+                __instance.health = 50;
+            };
+    }
+
+    [HarmonyPatch(typeof(TimeOfDay), "CalcuatePlanetTime")]
+    [HarmonyTranspiler]
+    public float FasterDayCycle(SelectableLevel level)
+    {
+	return (globalTime + level.OffsetFromGlobalTime) * level.DaySpeedMultiplier * 2 % (totalTime + 1f);
     }
 
 }
