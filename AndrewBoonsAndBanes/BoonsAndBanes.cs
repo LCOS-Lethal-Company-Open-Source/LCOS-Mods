@@ -101,7 +101,6 @@ public class TerminalCommandFunctions(){
         StartOfRound.Instance.companyBuyingRate *= 2;
     }
 
-
     [HarmonyPatch(typeof(PlayerControllerB), "Update")]
     [HarmonyPostfix]
     static void halfMaxHealth(PlayerControllerB __instance){
@@ -110,11 +109,15 @@ public class TerminalCommandFunctions(){
             };
     }
 
-    [HarmonyPatch(typeof(TimeOfDay), "CalcuatePlanetTime")]
-    [HarmonyTranspiler]
-    public float FasterDayCycle(SelectableLevel level)
-    {
-	return (globalTime + level.OffsetFromGlobalTime) * level.DaySpeedMultiplier * 2 % (totalTime + 1f);
-    }
+    //float globalTime = Traverse.Create(typeof(TimeOfDay)).Field("globalTime").GetValue() as float;
+    //float totalTime = Traverse.Create(typeof(TimeOfDay)).Field("totalTime").GetValue() as float;
 
+
+
+    [HarmonyPatch(typeof(TimeOfDay), "CalcuatePlanetTime")]
+    [HarmonyPostfix]
+    static void FasterDayCycle(SelectableLevel __instance, float ___globalTime, float ___totalTime, int daytimeMultipler = 2)
+    {
+	    return (___globalTime + __instance.OffsetFromGlobalTime) * __instance.DaySpeedMultiplier * daytimeMultipler % (___totalTime + 1f);
+    }
 }
