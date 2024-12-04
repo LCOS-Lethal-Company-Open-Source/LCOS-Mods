@@ -32,9 +32,9 @@ namespace RandomCompany.Patches
 
             // Load movement speed multiplier values
             movementSpeed = 0;
-            movementSpeedMultiplierUpper = RandomCompany.cfg.moveSpeedUpper.Value;
-            movementSpeedMultiplierLower = RandomCompany.cfg.moveSpeedLower.Value;
-            movementSpeedMultiplierEnabled = RandomCompany.cfg.moveSpeedEnabled.Value;
+            movementSpeedMultiplierUpper = Config.Instance.moveSpeedUpper.Value;
+            movementSpeedMultiplierLower = Config.Instance.moveSpeedLower.Value;
+            movementSpeedMultiplierEnabled = Config.Instance.moveSpeedEnabled.Value;
             if(movementSpeedMultiplierLower > movementSpeedMultiplierUpper || !movementSpeedMultiplierEnabled)
             {
                 movementSpeedMultiplierLower = 1;
@@ -43,9 +43,9 @@ namespace RandomCompany.Patches
 
             // Load climb speed multiplier values
             climbSpeed = 0;
-            climbSpeedMultiplierUpper = RandomCompany.cfg.climbSpeedUpper.Value;
-            climbSpeedMultiplierLower = RandomCompany.cfg.climbSpeedLower.Value;
-            climbSpeedMultiplierEnabled = RandomCompany.cfg.climbSpeedEnabled.Value;
+            climbSpeedMultiplierUpper = Config.Instance.climbSpeedUpper.Value;
+            climbSpeedMultiplierLower = Config.Instance.climbSpeedLower.Value;
+            climbSpeedMultiplierEnabled = Config.Instance.climbSpeedEnabled.Value;
             if(climbSpeedMultiplierLower > climbSpeedMultiplierUpper || !climbSpeedMultiplierEnabled)
             {
                 climbSpeedMultiplierLower = 1;
@@ -60,14 +60,15 @@ namespace RandomCompany.Patches
             // Set Player movement speed
             if(movementSpeed == 0)
             {
-                movementSpeed *= movementSpeedMultiplierLower + (float)(random.NextDouble() * (movementSpeedMultiplierUpper - movementSpeedMultiplierLower));
+                movementSpeed = ___movementSpeed * movementSpeedMultiplierLower + (float)(random.NextDouble() * (movementSpeedMultiplierUpper - movementSpeedMultiplierLower));
+                RandomCompany.logMessage(movementSpeed.ToString());
             }
             ___movementSpeed = movementSpeed;
             
             // Set Player climb speed
             if(climbSpeed == 0)
             {
-                climbSpeed *= movementSpeedMultiplierLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower));
+                climbSpeed = ___climbSpeed * movementSpeedMultiplierLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower));
             }
             ___climbSpeed = climbSpeed;
         }
