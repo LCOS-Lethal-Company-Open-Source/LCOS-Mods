@@ -17,9 +17,14 @@ namespace RandomCompany.Patches
         private static System.Random random;
 
         private static float movementSpeed;
-        private static float movementSpeedMultiplierUpper;
-        private static float movementSpeedMultiplierLower;
-        private static bool movementSpeedMultiplierEnabled;
+        private static float movementSpeedMulUpper;
+        private static float movementSpeedMulLower;
+        private static bool movementSpeedMulEnabled;
+
+        private static float sprintTime;
+        private static float sprintTimeMulUpper;
+        private static float sprintTimeMulLower;
+        private static bool sprintTimeMulEnabled;
 
         private static float climbSpeed;
         private static float climbSpeedMultiplierUpper;
@@ -30,47 +35,77 @@ namespace RandomCompany.Patches
         {
             random = new Random();
 
-            // Load movement speed multiplier values
-            movementSpeed = 0;
-            movementSpeedMultiplierUpper = Config.Instance.moveSpeedUpper.Value;
-            movementSpeedMultiplierLower = Config.Instance.moveSpeedLower.Value;
-            movementSpeedMultiplierEnabled = Config.Instance.moveSpeedEnabled.Value;
-            if(movementSpeedMultiplierLower > movementSpeedMultiplierUpper || !movementSpeedMultiplierEnabled)
+            try
             {
-                movementSpeedMultiplierLower = 1;
-                movementSpeedMultiplierUpper = 1;
-            }
+                // Load movement speed multiplier values
+                movementSpeed = 0;
+                movementSpeedMulUpper = Config.Instance.moveSpeedMulUpper.Value;
+                movementSpeedMulLower = Config.Instance.moveSpeedMulLower.Value;
+                movementSpeedMulEnabled = Config.Instance.moveSpeedMultiplierEnabled.Value;
+                if (movementSpeedMulLower > movementSpeedMulUpper || !movementSpeedMulEnabled)
+                {
+                    movementSpeedMulLower = 1;
+                    movementSpeedMulUpper = 1;
+                }
 
-            // Load climb speed multiplier values
-            climbSpeed = 0;
-            climbSpeedMultiplierUpper = Config.Instance.climbSpeedUpper.Value;
-            climbSpeedMultiplierLower = Config.Instance.climbSpeedLower.Value;
-            climbSpeedMultiplierEnabled = Config.Instance.climbSpeedEnabled.Value;
-            if(climbSpeedMultiplierLower > climbSpeedMultiplierUpper || !climbSpeedMultiplierEnabled)
+                // Load sprint time multiplier values
+                sprintTime = 0;
+                sprintTimeMulLower = Config.Instance.sprintTimeMulLower.Value;
+                sprintTimeMulUpper = Config.Instance.sprintTimeMulUpper.Value;
+                sprintTimeMulEnabled = Config.Instance.sprintTimeMulEnabled.Value;
+                if (sprintTimeMulLower > sprintTimeMulUpper || !sprintTimeMulEnabled)
+                {
+                    sprintTimeMulLower = 1;
+                    sprintTimeMulUpper = 1;
+                }
+
+                // Load climb speed multiplier values
+                climbSpeed = 0;
+                climbSpeedMultiplierUpper = Config.Instance.climbSpeedMulUpper.Value;
+                climbSpeedMultiplierLower = Config.Instance.climbSpeedMulLower.Value;
+                climbSpeedMultiplierEnabled = Config.Instance.climbSpeedMultiplierEnabled.Value;
+                if (climbSpeedMultiplierLower > climbSpeedMultiplierUpper || !climbSpeedMultiplierEnabled)
+                {
+                    climbSpeedMultiplierLower = 1;
+                    climbSpeedMultiplierUpper = 1;
+                }
+            }
+            catch(Exception ex)
             {
-                climbSpeedMultiplierLower = 1;
-                climbSpeedMultiplierUpper = 1;
+                RandomCompany.logMessage("Error " + ex);
             }
         }
-
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
-        static void RandomizePlayerControllerPatch(ref float ___movementSpeed, ref float ___climbSpeed)
+        static void RandomizePlayerControllerPatch(PlayerControllerB __instance)
         {
+            // error handling
+            if(__instance == null)
+            {
+                RandomCompany.logMessage("failed to retrieve PlayerControllerB reference");
+                return;
+            }
+
             // Set Player movement speed
-            if(movementSpeed == 0)
+            if (movementSpeed == 0)
             {
-                movementSpeed = ___movementSpeed * movementSpeedMultiplierLower + (float)(random.NextDouble() * (movementSpeedMultiplierUpper - movementSpeedMultiplierLower));
-                RandomCompany.logMessage(movementSpeed.ToString());
+                movementSpeed = __instance.movementSpeed * movementSpeedMulLower + (float)(random.NextDouble() * (movementSpeedMulUpper - movementSpeedMulLower));
             }
-            ___movementSpeed = movementSpeed;
-            
+            __instance.movementSpeed = movementSpeed;
+
+            // Set Player Jump Force
+            if(sprintTime == 0)
+            {
+                sprintTime = __instance.sprintTime * sprintTimeMulLower + (float)(random.NextDouble() * (sprintTimeMulUpper - sprintTimeMulLower));
+            }
+            __instance.sprintTime = sprintTime;
+
             // Set Player climb speed
-            if(climbSpeed == 0)
+            if (climbSpeed == 0)
             {
-                climbSpeed = ___climbSpeed * movementSpeedMultiplierLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower));
+                climbSpeed = __instance.climbSpeed * movementSpeedMulLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower));
             }
-            ___climbSpeed = climbSpeed;
+            __instance.climbSpeed = climbSpeed;
         }
 
         [HarmonyPostfix]

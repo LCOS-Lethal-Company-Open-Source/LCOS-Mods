@@ -19,16 +19,16 @@ namespace RandomCompany.Patches
 
         public RoundManagerPatch()
         {
-            scrapSpawnLower = Config.Instance.scrapSpawnLower.Value;
-            scrapSpawnUpper = Config.Instance.scrapSpawnUpper.Value;
-            if (scrapSpawnLower > scrapSpawnUpper || !Config.Instance.scrapSpawnRateEnabled.Value)
+            scrapSpawnLower = Config.Instance.scrapSpawnMulLower.Value;
+            scrapSpawnUpper = Config.Instance.scrapSpawnMulUpper.Value;
+            if (scrapSpawnLower > scrapSpawnUpper || !Config.Instance.scrapSpawnMultiplierEnabled.Value)
             {
                 scrapSpawnLower = 1;
                 scrapSpawnUpper = 1;
             }
 
-            scrapValueLower = Config.Instance.scrapValueLower.Value;
-            scrapValueUpper = Config.Instance.scrapValueUpper.Value;
+            scrapValueLower = Config.Instance.scrapValueMultiplierLower.Value;
+            scrapValueUpper = Config.Instance.scrapValueMultiplierUpper.Value;
             if (scrapValueLower > scrapValueUpper || !Config.Instance.scrapValueEnabled.Value)
             {
                 scrapValueLower = 1;

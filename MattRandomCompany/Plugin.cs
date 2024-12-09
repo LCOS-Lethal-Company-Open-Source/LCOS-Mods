@@ -29,7 +29,7 @@ namespace RandomCompany
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
-        private static RandomCompany instance;
+        public static RandomCompany instance { get; private set; } = null;
         private RoundManagerPatch rmp;
         private PlayerControllerBPatch pcbp;
 
@@ -42,15 +42,16 @@ namespace RandomCompany
             {
                 instance = this;
             }
-            cfg = new Config(base.Config);
-            
-            rmp = new RoundManagerPatch();
-            pcbp = new PlayerControllerBPatch();
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
-            mls.LogInfo(modName + " has started");
+            cfg = new Config(base.Config);
+            mls.LogInfo("Config initialized");
+            rmp = new RoundManagerPatch();
+            pcbp = new PlayerControllerBPatch();
 
+            mls.LogInfo(modName + " has started");
+            
             harmony.PatchAll();
 
             

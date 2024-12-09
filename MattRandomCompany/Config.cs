@@ -15,23 +15,29 @@ namespace RandomCompany
     [Serializable]
     class Config : SyncedInstance<Config>
     {
-        //Scrap
-        public readonly ConfigEntry<float> scrapSpawnLower;
-        public readonly ConfigEntry<float> scrapSpawnUpper;
-        public readonly ConfigEntry<bool> scrapSpawnRateEnabled;
 
-        public readonly ConfigEntry<float> scrapValueLower;
-        public readonly ConfigEntry<float> scrapValueUpper;
+        //Scrap
+        public readonly ConfigEntry<float> scrapSpawnMulLower;
+        public readonly ConfigEntry<float> scrapSpawnMulUpper;
+        public readonly ConfigEntry<bool> scrapSpawnMultiplierEnabled;
+
+        public readonly ConfigEntry<float> scrapValueMultiplierLower;
+        public readonly ConfigEntry<float> scrapValueMultiplierUpper;
         public readonly ConfigEntry<bool> scrapValueEnabled;
 
         //Player Controller
-        public readonly ConfigEntry<float> moveSpeedLower;
-        public readonly ConfigEntry<float> moveSpeedUpper;
-        public readonly ConfigEntry<bool> moveSpeedEnabled;
 
-        public readonly ConfigEntry<float> climbSpeedLower;
-        public readonly ConfigEntry<float> climbSpeedUpper;
-        public readonly ConfigEntry<bool> climbSpeedEnabled;
+        public readonly ConfigEntry<float> moveSpeedMulLower;
+        public readonly ConfigEntry<float> moveSpeedMulUpper;
+        public readonly ConfigEntry<bool> moveSpeedMultiplierEnabled;
+
+        public readonly ConfigEntry<float> sprintTimeMulLower;
+        public readonly ConfigEntry<float> sprintTimeMulUpper;
+        public readonly ConfigEntry<bool> sprintTimeMulEnabled;
+
+        public readonly ConfigEntry<float> climbSpeedMulLower;
+        public readonly ConfigEntry<float> climbSpeedMulUpper;
+        public readonly ConfigEntry<bool> climbSpeedMultiplierEnabled;
 
         public Config(ConfigFile cfg) {
             InitInstance(this);
@@ -39,24 +45,27 @@ namespace RandomCompany
             
             // Scrap
 
-            scrapSpawnLower = cfg.Bind<float>("General.Scrap", "ScrapSpawnRateLowerBound", 1, "The Minimum Scrap Spawn Rate Multiplier");
-            scrapSpawnUpper = cfg.Bind<float>("General.Scrap", "ScrapSpawnRateUpperBound", 1, "The Maximum Scrap Spawn Rate Multiplier");
-            scrapSpawnRateEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapSpawnRateMultiplierEnabled", true, "Enables Scrap Spawn Rate Multiplier ... true : enabled ... false : disabled");
+            scrapSpawnMulLower = cfg.Bind<float>("General.Scrap", "ScrapSpawnMultiplierLowerBound", 1, "The Minimum Scrap Spawn Rate Multiplier");
+            scrapSpawnMulUpper = cfg.Bind<float>("General.Scrap", "ScrapSpawnMultiplierUpperBound", 1, "The Maximum Scrap Spawn Rate Multiplier");
+            scrapSpawnMultiplierEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapSpawnRateMultiplierEnabled", true, "Enables Scrap Spawn Rate Multiplier ... true : enabled ... false : disabled");
 
-            scrapValueLower = cfg.Bind<float>("General.Scrap", "ScrapValueLowerBound", 1, "The Minimum Scrap Value Multiplier");
-            scrapValueUpper = cfg.Bind<float>("General.Scrap", "ScrapValueUpperBound", 1, "The Maximum Scrap Value Multiplier");
+            scrapValueMultiplierLower = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierLowerBound", 1, "The Minimum Scrap Value Multiplier");
+            scrapValueMultiplierUpper = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierUpperBound", 1, "The Maximum Scrap Value Multiplier");
             scrapValueEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapValueMultiplierEnabled", true, "Enables Scrap Value Multiplier ... true : enabled ... false : disabled");
 
             // Player Controller
 
-            moveSpeedLower = cfg.Bind<float>("General.Movement", "MoveSpeedLowerBound", 1, "The Minimum Movement Speed Multiplier");
-            moveSpeedUpper = cfg.Bind<float>("General.Movement", "MoveSpeedUpperBound", 1, "The Maximum Movement Speed Multiplier");            
-            moveSpeedEnabled = cfg.Bind<bool>("General.Movement.Toggles", "MoveSpeedEnabled", true, "Enables Player Movement Speed Multiplier ... true : enabled ... false : disabled");
+            moveSpeedMulLower = cfg.Bind<float>("General.Movement", "MoveSpeedMultiplierLowerBound", 1, "The Minimum Movement Speed Multiplier");
+            moveSpeedMulUpper = cfg.Bind<float>("General.Movement", "MoveSpeedMultiplierUpperBound", 1, "The Maximum Movement Speed Multiplier");            
+            moveSpeedMultiplierEnabled = cfg.Bind<bool>("General.Movement.Toggles", "MoveSpeedEnabled", true, "Enables Player Movement Speed Multiplier ... true : enabled ... false : disabled");
 
+            sprintTimeMulLower = cfg.Bind<float>("General.Movement", "SprintTimeMultiplierLowerBound", 1, "The Minimum Multiplier for Sprint Time");
+            sprintTimeMulUpper = cfg.Bind<float>("General.Movement", "SprintTimeMultiplierUpperBound", 1, "The Maximum Multiplier for Sprint Time");
+            sprintTimeMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "SprintTimeMultiplierEnabled", true, "Enables Sprint Time Multiplier ... true : enabled ... false : disabled");
 
-            climbSpeedLower = cfg.Bind<float>("General.Movement", "ClimbSpeedLowerBound", 1, "The Maximum Climb Speed Multiplier");
-            climbSpeedUpper = cfg.Bind<float>("General.Movement", "ClimbSpeedUpperBound", 1, "The Maximum Climb Speed Multiplier");
-            climbSpeedEnabled = cfg.Bind<bool>("General.Movement.Toggles", "ClimbSpeedEnabled", true, "Enables Player Climb Speed Multiplier ... true : enabled ... false : disabled");
+            climbSpeedMulLower = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierLowerBound", 1, "The Maximum Climb Speed Multiplier");
+            climbSpeedMulUpper = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierUpperBound", 1, "The Maximum Climb Speed Multiplier");
+            climbSpeedMultiplierEnabled = cfg.Bind<bool>("General.Movement.Toggles", "ClimbSpeedMultiplierEnabled", true, "Enables Player Climb Speed Multiplier ... true : enabled ... false : disabled");
 
             ClearOrphanedEntries(cfg);
 
