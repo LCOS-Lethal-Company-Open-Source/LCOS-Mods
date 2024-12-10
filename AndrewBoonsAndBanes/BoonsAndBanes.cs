@@ -2,10 +2,14 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using Steamworks.ServerList;
 using TerminalApi;
 using TerminalApi.Classes;
 using static TerminalApi.Events.Events;
 using static TerminalApi.TerminalApi;
+using System.Collections.Generic;  // Required for IEnumerable<T>
+using System.Reflection.Emit;  // Required for OpCodes
+
 
 
 namespace BoonsAndBanes;
@@ -87,11 +91,20 @@ public class BoonsAndBanes : BaseUnityPlugin
     }
 }
 
-public class TerminalCommandFunctions(){
+[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+//[BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.HardDependency)]
+[BepInDependency("atomic.terminalapi", BepInDependency.DependencyFlags.HardDependency)]
+public class TerminalCommandFunctions : BaseUnityPlugin{
+    internal new static ManualLogSource Logger2 { get; private set; } = null!;
     int ScrapMultiplier = 1;
     string[] boonNames = ["ExtraLife"];
     string[] baneNames = ["HalfHealth", "OopsItsAllX", "FasterDayCycle"];
     string[] cheatNames = ["DoubleSellValue"];
+
+    private void Awake(){
+        Logger2 = base.Logger;
+    }
+
     public int getMultiplier(){
         return ScrapMultiplier;
     }
@@ -127,7 +140,8 @@ public class TerminalCommandFunctions(){
         public static void ApplyDaySpeedMultiplier(float multiplier)
         {
             // Modify the multiplier, here we simply adjust it to speed up or slow down the day cycle
-            f_daySpeedMultiplier.SetValue(null, f_daySpeedMultiplier.GetValue(null) * multiplier); // Adjust multiplier
+            float currentMultiplier = (float)f_daySpeedMultiplier.GetValue(null); // Get current multiplier value (static access)
+            f_daySpeedMultiplier.SetValue(null, currentMultiplier * multiplier); // Adjust multiplier (static access)
         }
 
         // This is the transpiler function that modifies CalculatePlanetTime
@@ -151,9 +165,11 @@ public class TerminalCommandFunctions(){
             // If the DaySpeedMultiplier field is not found, report an error
             if (!found)
             {
-                ReportError("Cannot find DaySpeedMultiplier in TimeOfDay.CalculatePlanetTime");
+                Logger2.LogDebug("Day Speed Multiplier Failed\n");
             }
         }
+
+        
 
     //old
 
