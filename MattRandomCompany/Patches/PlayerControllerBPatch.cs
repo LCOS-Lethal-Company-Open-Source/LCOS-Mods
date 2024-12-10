@@ -26,6 +26,11 @@ namespace RandomCompany.Patches
         private static float sprintTimeMulLower;
         private static bool sprintTimeMulEnabled;
 
+        private static float jumpForce;
+        private static float jumpForceMulUpper;
+        private static float jumpForceMulLower;
+        private static bool jumpForceMulEnabled;
+
         private static float climbSpeed;
         private static float climbSpeedMultiplierUpper;
         private static float climbSpeedMultiplierLower;
@@ -41,7 +46,7 @@ namespace RandomCompany.Patches
                 movementSpeed = 0;
                 movementSpeedMulUpper = Config.Instance.moveSpeedMulUpper.Value;
                 movementSpeedMulLower = Config.Instance.moveSpeedMulLower.Value;
-                movementSpeedMulEnabled = Config.Instance.moveSpeedMultiplierEnabled.Value;
+                movementSpeedMulEnabled = Config.Instance.moveSpeedMulEnabled.Value;
                 if (movementSpeedMulLower > movementSpeedMulUpper || !movementSpeedMulEnabled)
                 {
                     movementSpeedMulLower = 1;
@@ -59,11 +64,22 @@ namespace RandomCompany.Patches
                     sprintTimeMulUpper = 1;
                 }
 
+                // Load jump force values
+                jumpForce = 0;
+                jumpForceMulUpper = Config.Instance.jumpForceMulLower.Value;
+                jumpForceMulUpper = Config.Instance.jumpForceMulUpper.Value;
+                jumpForceMulEnabled = Config.Instance.jumpForceMulEnabled.Value;
+                if(jumpForceMulLower > jumpForceMulUpper || !jumpForceMulEnabled)
+                {
+                    jumpForceMulLower = 1;
+                    jumpForceMulUpper = 1;
+                }
+
                 // Load climb speed multiplier values
                 climbSpeed = 0;
                 climbSpeedMultiplierUpper = Config.Instance.climbSpeedMulUpper.Value;
                 climbSpeedMultiplierLower = Config.Instance.climbSpeedMulLower.Value;
-                climbSpeedMultiplierEnabled = Config.Instance.climbSpeedMultiplierEnabled.Value;
+                climbSpeedMultiplierEnabled = Config.Instance.climbSpeedMulEnabled.Value;
                 if (climbSpeedMultiplierLower > climbSpeedMultiplierUpper || !climbSpeedMultiplierEnabled)
                 {
                     climbSpeedMultiplierLower = 1;
@@ -89,23 +105,32 @@ namespace RandomCompany.Patches
             // Set Player movement speed
             if (movementSpeed == 0)
             {
-                movementSpeed = __instance.movementSpeed * movementSpeedMulLower + (float)(random.NextDouble() * (movementSpeedMulUpper - movementSpeedMulLower));
+                movementSpeed = __instance.movementSpeed * (movementSpeedMulLower + (float)(random.NextDouble() * (movementSpeedMulUpper - movementSpeedMulLower)));
             }
             __instance.movementSpeed = movementSpeed;
 
-            // Set Player Jump Force
+            // Set Player sprint time
             if(sprintTime == 0)
             {
-                sprintTime = __instance.sprintTime * sprintTimeMulLower + (float)(random.NextDouble() * (sprintTimeMulUpper - sprintTimeMulLower));
+                sprintTime = __instance.sprintTime * (sprintTimeMulLower + (float)(random.NextDouble() * (sprintTimeMulUpper - sprintTimeMulLower)));
             }
             __instance.sprintTime = sprintTime;
+
+            // Set Player jump force
+            if(jumpForce == 0)
+            {
+                
+                jumpForce = __instance.jumpForce * (jumpForceMulLower + (float)(random.NextDouble() * (jumpForceMulUpper - jumpForceMulLower)));
+            }
+            __instance.jumpForce = jumpForce;
 
             // Set Player climb speed
             if (climbSpeed == 0)
             {
-                climbSpeed = __instance.climbSpeed * movementSpeedMulLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower));
+                climbSpeed = __instance.climbSpeed * (movementSpeedMulLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower)));
             }
             __instance.climbSpeed = climbSpeed;
+
         }
 
         [HarmonyPostfix]

@@ -19,25 +19,29 @@ namespace RandomCompany
         //Scrap
         public readonly ConfigEntry<float> scrapSpawnMulLower;
         public readonly ConfigEntry<float> scrapSpawnMulUpper;
-        public readonly ConfigEntry<bool> scrapSpawnMultiplierEnabled;
+        public readonly ConfigEntry<bool> scrapSpawnMulEnabled;
 
-        public readonly ConfigEntry<float> scrapValueMultiplierLower;
-        public readonly ConfigEntry<float> scrapValueMultiplierUpper;
-        public readonly ConfigEntry<bool> scrapValueEnabled;
+        public readonly ConfigEntry<float> scrapValueMulLower;
+        public readonly ConfigEntry<float> scrapValueMulUpper;
+        public readonly ConfigEntry<bool> scrapValueMulEnabled;
 
         //Player Controller
 
         public readonly ConfigEntry<float> moveSpeedMulLower;
         public readonly ConfigEntry<float> moveSpeedMulUpper;
-        public readonly ConfigEntry<bool> moveSpeedMultiplierEnabled;
+        public readonly ConfigEntry<bool> moveSpeedMulEnabled;
 
         public readonly ConfigEntry<float> sprintTimeMulLower;
         public readonly ConfigEntry<float> sprintTimeMulUpper;
         public readonly ConfigEntry<bool> sprintTimeMulEnabled;
 
+        public readonly ConfigEntry<float> jumpForceMulLower;
+        public readonly ConfigEntry<float> jumpForceMulUpper;
+        public readonly ConfigEntry<bool> jumpForceMulEnabled;
+
         public readonly ConfigEntry<float> climbSpeedMulLower;
         public readonly ConfigEntry<float> climbSpeedMulUpper;
-        public readonly ConfigEntry<bool> climbSpeedMultiplierEnabled;
+        public readonly ConfigEntry<bool> climbSpeedMulEnabled;
 
         public Config(ConfigFile cfg) {
             InitInstance(this);
@@ -47,25 +51,29 @@ namespace RandomCompany
 
             scrapSpawnMulLower = cfg.Bind<float>("General.Scrap", "ScrapSpawnMultiplierLowerBound", 1, "The Minimum Scrap Spawn Rate Multiplier");
             scrapSpawnMulUpper = cfg.Bind<float>("General.Scrap", "ScrapSpawnMultiplierUpperBound", 1, "The Maximum Scrap Spawn Rate Multiplier");
-            scrapSpawnMultiplierEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapSpawnRateMultiplierEnabled", true, "Enables Scrap Spawn Rate Multiplier ... true : enabled ... false : disabled");
+            scrapSpawnMulEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapSpawnRateMultiplierEnabled", true, "Enables Scrap Spawn Rate Multiplier ... true : enabled ... false : disabled");
 
-            scrapValueMultiplierLower = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierLowerBound", 1, "The Minimum Scrap Value Multiplier");
-            scrapValueMultiplierUpper = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierUpperBound", 1, "The Maximum Scrap Value Multiplier");
-            scrapValueEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapValueMultiplierEnabled", true, "Enables Scrap Value Multiplier ... true : enabled ... false : disabled");
+            scrapValueMulLower = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierLowerBound", 1, "The Minimum Scrap Value Multiplier");
+            scrapValueMulUpper = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierUpperBound", 1, "The Maximum Scrap Value Multiplier");
+            scrapValueMulEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapValueMultiplierEnabled", true, "Enables Scrap Value Multiplier ... true : enabled ... false : disabled");
 
             // Player Controller
 
             moveSpeedMulLower = cfg.Bind<float>("General.Movement", "MoveSpeedMultiplierLowerBound", 1, "The Minimum Movement Speed Multiplier");
             moveSpeedMulUpper = cfg.Bind<float>("General.Movement", "MoveSpeedMultiplierUpperBound", 1, "The Maximum Movement Speed Multiplier");            
-            moveSpeedMultiplierEnabled = cfg.Bind<bool>("General.Movement.Toggles", "MoveSpeedEnabled", true, "Enables Player Movement Speed Multiplier ... true : enabled ... false : disabled");
+            moveSpeedMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "MoveSpeedEnabled", true, "Enables Player Movement Speed Multiplier ... true : enabled ... false : disabled");
 
             sprintTimeMulLower = cfg.Bind<float>("General.Movement", "SprintTimeMultiplierLowerBound", 1, "The Minimum Multiplier for Sprint Time");
             sprintTimeMulUpper = cfg.Bind<float>("General.Movement", "SprintTimeMultiplierUpperBound", 1, "The Maximum Multiplier for Sprint Time");
             sprintTimeMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "SprintTimeMultiplierEnabled", true, "Enables Sprint Time Multiplier ... true : enabled ... false : disabled");
 
+            jumpForceMulLower = cfg.Bind<float>("General.Movement", "JumpForceMultiplierLowerBound", 1, "The Minimum Multiplier for Jump Force");
+            jumpForceMulUpper = cfg.Bind<float>("General.Movement", "JumpForceMultiplierUpperBound", 1, "The Maximum Multiplier for Jump Force");
+            jumpForceMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "JumpForceMultiplierEnabled", true, "Enables Jump Force Multiplier ... true : enabled ... false : disabled");
+
             climbSpeedMulLower = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierLowerBound", 1, "The Maximum Climb Speed Multiplier");
             climbSpeedMulUpper = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierUpperBound", 1, "The Maximum Climb Speed Multiplier");
-            climbSpeedMultiplierEnabled = cfg.Bind<bool>("General.Movement.Toggles", "ClimbSpeedMultiplierEnabled", true, "Enables Player Climb Speed Multiplier ... true : enabled ... false : disabled");
+            climbSpeedMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "ClimbSpeedMultiplierEnabled", true, "Enables Player Climb Speed Multiplier ... true : enabled ... false : disabled");
 
             ClearOrphanedEntries(cfg);
 

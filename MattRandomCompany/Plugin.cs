@@ -46,7 +46,6 @@ namespace RandomCompany
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
             cfg = new Config(base.Config);
-            mls.LogInfo("Config initialized");
             rmp = new RoundManagerPatch();
             pcbp = new PlayerControllerBPatch();
 

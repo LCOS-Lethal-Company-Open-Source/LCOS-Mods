@@ -12,27 +12,37 @@ namespace RandomCompany.Patches
     internal class RoundManagerPatch
     {
         private static System.Random random;
-        private static float scrapSpawnLower; // minimum value for min and max scrap multiplier
-        private static float scrapSpawnUpper; // maximum value for min and max scrap multiplier
-        private static float scrapValueLower = .1f; // minimum value for scrap value multiplier
-        private static float scrapValueUpper = 10f; // maximum value for scrap value multiplier
+
+        private static float scrapSpawnMul;
+        private static float scrapSpawnMulLower; // minimum value for min and max scrap multiplier
+        private static float scrapSpawnMulUpper; // maximum value for min and max scrap multiplier
+        private static bool scrapSpawnMulEnabled;
+
+        private static float scrapValueMul;
+        private static float scrapValueMulLower; // minimum value for scrap value multiplier
+        private static float scrapValueMulUpper; // maximum value for scrap value multiplier
+        private static bool scrapValueMulEnabled;
 
         public RoundManagerPatch()
         {
-            scrapSpawnLower = Config.Instance.scrapSpawnMulLower.Value;
-            scrapSpawnUpper = Config.Instance.scrapSpawnMulUpper.Value;
-            if (scrapSpawnLower > scrapSpawnUpper || !Config.Instance.scrapSpawnMultiplierEnabled.Value)
+            scrapSpawnMul = 0;
+            scrapSpawnMulLower = Config.Instance.scrapSpawnMulLower.Value;
+            scrapSpawnMulUpper = Config.Instance.scrapSpawnMulUpper.Value;
+            scrapSpawnMulEnabled = Config.Instance.scrapSpawnMulEnabled.Value;
+            if (scrapSpawnMulLower > scrapSpawnMulUpper || !Config.Instance.scrapSpawnMulEnabled.Value)
             {
-                scrapSpawnLower = 1;
-                scrapSpawnUpper = 1;
+                scrapSpawnMulLower = 1;
+                scrapSpawnMulUpper = 1;
             }
 
-            scrapValueLower = Config.Instance.scrapValueMultiplierLower.Value;
-            scrapValueUpper = Config.Instance.scrapValueMultiplierUpper.Value;
-            if (scrapValueLower > scrapValueUpper || !Config.Instance.scrapValueEnabled.Value)
+            scrapValueMul = 0;
+            scrapValueMulLower = Config.Instance.scrapValueMulLower.Value;
+            scrapValueMulUpper = Config.Instance.scrapValueMulUpper.Value;
+            scrapValueMulEnabled = Config.Instance.scrapValueMulEnabled.Value;
+            if (scrapValueMulLower > scrapValueMulUpper || !Config.Instance.scrapValueMulEnabled.Value)
             {
-                scrapValueLower = 1;
-                scrapValueUpper = 1;
+                scrapValueMulLower = 1;
+                scrapValueMulUpper = 1;
             }
         }
 
@@ -43,17 +53,20 @@ namespace RandomCompany.Patches
         static void RandomizeSpawnScrapPatch(ref RoundManager __instance)
         {
             random = new Random();
-            double scrapSpawnMul = scrapSpawnLower + (random.NextDouble() * (scrapSpawnUpper - scrapSpawnLower));
-            string message = "scrapAmountMultiplier changed from " + __instance.scrapAmountMultiplier + " to ";
-            __instance.scrapAmountMultiplier *= (float)scrapSpawnMul;
-            message += __instance.scrapAmountMultiplier;
-            RandomCompany.logMessage(message);
 
-            float scrapValueMul = (float)(scrapValueLower + (random.NextDouble() * (scrapValueUpper - scrapValueLower)));
-            message = "scrapValueMultiplier changed from " + __instance.scrapValueMultiplier + " to ";
-            __instance.scrapValueMultiplier *= scrapValueMul;
-            message += __instance.scrapValueMultiplier;
-            RandomCompany.logMessage(message);
+            // Apply scrap spawn multiplier
+            if(scrapSpawnMul == 0)
+            {
+                scrapSpawnMul = __instance.scrapAmountMultiplier * (scrapSpawnMulLower + (float)(random.NextDouble() * (scrapSpawnMulUpper - scrapSpawnMulLower)));
+            }
+            __instance.scrapAmountMultiplier = scrapSpawnMul;
+
+            // Apply scrap value multiplier
+            if(scrapValueMul == 0)
+            {
+                scrapValueMul = __instance.scrapValueMultiplier * (scrapValueMulLower + (float)(random.NextDouble() * (scrapValueMulUpper - scrapValueMulLower)));
+            }
+            __instance.scrapValueMultiplier = scrapValueMul;
         }
     }
 }
