@@ -1,3 +1,4 @@
+using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -101,6 +102,8 @@ public class TerminalCommandFunctions(){
         StartOfRound.Instance.companyBuyingRate *= 2;
     }
 
+    // no reason for why this is broken???
+    /*
     [HarmonyPatch(typeof(PlayerControllerB), "Update")]
     [HarmonyPostfix]
     static void halfMaxHealth(PlayerControllerB __instance){
@@ -108,16 +111,57 @@ public class TerminalCommandFunctions(){
                 __instance.health = 50;
             };
     }
+    */
 
     //float globalTime = Traverse.Create(typeof(TimeOfDay)).Field("globalTime").GetValue() as float;
     //float totalTime = Traverse.Create(typeof(TimeOfDay)).Field("totalTime").GetValue() as float;
 
 
+             // The field that stores the DaySpeedMultiplier in SelectableLevel
+        static FieldInfo f_daySpeedMultiplier = AccessTools.Field(typeof(SelectableLevel), "DaySpeedMultiplier");
 
-    [HarmonyPatch(typeof(TimeOfDay), "CalcuatePlanetTime")]
-    [HarmonyPostfix]
-    static void FasterDayCycle(SelectableLevel __instance, float ___globalTime, float ___totalTime, int daytimeMultipler = 2)
+        // The method we want to call to apply a custom multiplier to DaySpeedMultiplier
+        static MethodInfo m_ApplyDaySpeedMultiplier = SymbolExtensions.GetMethodInfo(() => ApplyDaySpeedMultiplier(1.5f)); // 1.5x speed as an example
+
+        // Example method that applies a multiplier to the DaySpeedMultiplier
+        public static void ApplyDaySpeedMultiplier(float multiplier)
+        {
+            // Modify the multiplier, here we simply adjust it to speed up or slow down the day cycle
+            f_daySpeedMultiplier.SetValue(null, f_daySpeedMultiplier.GetValue(null) * multiplier); // Adjust multiplier
+        }
+
+        // This is the transpiler function that modifies CalculatePlanetTime
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var found = false;
+
+            foreach (var instruction in instructions)
+            {
+                // Look for the instruction that loads the DaySpeedMultiplier value (likely a load of the field)
+                if (instruction.LoadsField(f_daySpeedMultiplier))
+                {
+                    // Before using the DaySpeedMultiplier, call our method to apply the multiplier
+                    yield return new CodeInstruction(OpCodes.Call, m_ApplyDaySpeedMultiplier);  // Call method to modify multiplier
+                    found = true;
+                }
+
+                yield return instruction;
+            }
+
+            // If the DaySpeedMultiplier field is not found, report an error
+            if (!found)
+            {
+                ReportError("Cannot find DaySpeedMultiplier in TimeOfDay.CalculatePlanetTime");
+            }
+        }
+
+    //old
+
+    /*
+    static int FasterDayCycle(SelectableLevel __instance, float ___globalTime, float ___totalTime, int daytimeMultipler = 2)
     {
+         __instance.DaySpeedMultiplier * = 
 	    return (___globalTime + __instance.OffsetFromGlobalTime) * __instance.DaySpeedMultiplier * daytimeMultipler % (___totalTime + 1f);
     }
+    */
 }
