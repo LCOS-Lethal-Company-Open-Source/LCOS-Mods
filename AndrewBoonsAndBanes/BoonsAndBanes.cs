@@ -99,8 +99,24 @@ public class BoonsAndBanes : BaseUnityPlugin
                     Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
 
                     // Apply the updated multiplier using Harmony
-                    Harmony.Patch(typeof(EnemyAI),
+                    Harmony.Patch(typeof(EnemyAI).GetMethod("EnemyAI"),
                         new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply")));
+                    
+                    return $"EnemyHealth Multiplied to  {currentDaySpeedMultiplier}!";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("RemoveBane MultiplyEnemyHealth", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    // Increment the multiplier by 1.0f (you can adjust the increment value)
+                    enemyHealthMultiplyer -= 1.0f;  
+                    Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
+
+                    // Apply the updated multiplier using Harmony
+                    Harmony.Unpatch(typeof(EnemyAI).GetMethod("EnemyAI"), typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply"));
                     
                     return $"EnemyHealth Multiplied to  {currentDaySpeedMultiplier}!";
                 },
