@@ -51,6 +51,10 @@ namespace RandomCompany
         public readonly ConfigEntry<float> climbSpeedMulUpper;
         public readonly ConfigEntry<bool> climbSpeedMulEnabled;
 
+        public readonly ConfigEntry<float> insanityMulLower;
+        public readonly ConfigEntry<float> insanityMulUpper;
+        public readonly ConfigEntry<bool> insanityMulEnabled;
+
         public Config(ConfigFile cfg) {
             InitInstance(this);
             cfg.SaveOnConfigSet = false;
@@ -85,10 +89,14 @@ namespace RandomCompany
             jumpForceMulUpper = cfg.Bind<float>("General.Movement", "JumpForceMultiplierUpperBound", 1, "The Maximum Multiplier for Jump Force");
             jumpForceMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "JumpForceMultiplierEnabled", true, "Enables Jump Force Multiplier ... true : enabled ... false : disabled");
 
-            climbSpeedMulLower = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierLowerBound", 1, "The Maximum Climb Speed Multiplier");
+            climbSpeedMulLower = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierLowerBound", 1, "The Minimum Climb Speed Multiplier");
             climbSpeedMulUpper = cfg.Bind<float>("General.Movement", "ClimbSpeedMultiplierUpperBound", 1, "The Maximum Climb Speed Multiplier");
             climbSpeedMulEnabled = cfg.Bind<bool>("General.Movement.Toggles", "ClimbSpeedMultiplierEnabled", true, "Enables Player Climb Speed Multiplier ... true : enabled ... false : disabled");
 
+            insanityMulLower = cfg.Bind<float>("General.PlayerCharacteristics", "InsanitySpeedMultiplierLowerBound", 1, "The Minimum Insanity Speed Multiplier");
+            insanityMulUpper = cfg.Bind<float>("General.PlayerCharacteristics", "InsanitySpeedMultiplierUpperBound", 1, "The Maximum Insanity Speed Multiplier");
+            insanityMulEnabled = cfg.Bind<bool>("General.PlayerCharacteristics.Toggles", "InsanitySpeedMultiplierEnabled", true, "Enables Insanity Speed Multiplier ... true : enabled ... false : disabled");
+            
             ClearOrphanedEntries(cfg);
 
             cfg.Save();

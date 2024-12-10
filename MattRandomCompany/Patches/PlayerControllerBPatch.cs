@@ -14,6 +14,8 @@ namespace RandomCompany.Patches
     internal class PlayerControllerBPatch
     {
 
+        // insanity
+
         private static System.Random random;
 
         private static float movementSpeed;
@@ -35,6 +37,11 @@ namespace RandomCompany.Patches
         private static float climbSpeedMultiplierUpper;
         private static float climbSpeedMultiplierLower;
         private static bool climbSpeedMultiplierEnabled;
+
+        private static float insanityMul;
+        private static float insanityMulLower;
+        private static float insanityMulUpper;
+        private static bool insanityMulEnabled;
 
         public PlayerControllerBPatch()
         {
@@ -85,6 +92,17 @@ namespace RandomCompany.Patches
                     climbSpeedMultiplierLower = 1;
                     climbSpeedMultiplierUpper = 1;
                 }
+
+                // Load insanity multiplier values
+                insanityMul = 0;
+                insanityMulLower = Config.Instance.insanityMulLower.Value;
+                insanityMulUpper = Config.Instance.insanityMulUpper.Value;
+                insanityMulEnabled = Config.Instance.insanityMulEnabled.Value;
+                if(insanityMulLower > insanityMulUpper || !insanityMulEnabled)
+                {
+                    insanityMulLower = 1;
+                    insanityMulUpper = 1;
+                }
             }
             catch(Exception ex)
             {
@@ -130,6 +148,13 @@ namespace RandomCompany.Patches
                 climbSpeed = __instance.climbSpeed * (movementSpeedMulLower + (float)(random.NextDouble() * (climbSpeedMultiplierUpper - climbSpeedMultiplierLower)));
             }
             __instance.climbSpeed = climbSpeed;
+
+            // Set player insanity multiplier
+            if(insanityMul == 0)
+            {
+                insanityMul = __instance.insanitySpeedMultiplier * (insanityMulLower + (float)(random.NextDouble() * (insanityMulUpper - insanityMulLower)));   
+            }
+            __instance.insanitySpeedMultiplier = insanityMul;
 
         }
 
