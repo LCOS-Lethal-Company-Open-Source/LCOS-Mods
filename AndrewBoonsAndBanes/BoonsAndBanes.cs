@@ -25,6 +25,8 @@ public class BoonsAndBanes : BaseUnityPlugin
 
     internal static TerminalCommandFunctions CommandData = new TerminalCommandFunctions();
 
+    public static float currentDaySpeedMultiplier = 1.0f;  // Default multiplier
+
     private void Awake()
     {
         Logger = base.Logger;
@@ -68,6 +70,39 @@ public class BoonsAndBanes : BaseUnityPlugin
                 },
                 Category = "BoonsAndBanesMod",
             });
+
+            AddCommand("Bane IncreaseDaySpeed", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    // Increment the multiplier by 1.0f (you can adjust the increment value)
+                    currentDaySpeedMultiplier += 1.0f;  
+                    Logger.LogInfo($"Day speed multiplier increased to {currentDaySpeedMultiplier}");
+
+                    // Apply the updated multiplier using Harmony
+                    Harmony.Patch(typeof(TimeOfDay).GetMethod("ApplyDaySpeedMultiplier"),
+                        new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch")));
+                    
+                    return $"Day speed multiplier increased to {currentDaySpeedMultiplier}!";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("Bane RemoveDaySpeedMultiplierPatch", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    // Unpatch the method
+                    Harmony.Unpatch(typeof(TimeOfDay).GetMethod("ApplyDaySpeedMultiplier"), typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch"));
+                    currentDaySpeedMultiplier = 0.0f;
+                    
+                    Logger.LogInfo("Day speed multiplier patch removed!");
+
+                    return "Day speed multiplier patch removed, restoring original behavior.";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
 
             AddCommand("Cheat DoubleSellValue", new CommandInfo(){
             
