@@ -11,7 +11,6 @@ using System.Collections.Generic;  // Required for IEnumerable<T>
 using System.Reflection.Emit;  // Required for OpCodes
 
 
-
 namespace BoonsAndBanes;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
@@ -209,18 +208,18 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
     public static void Prefix(ref int num, ref List<Item> ScrapToSpawn, ref List<int> list)
     {
-        // Multiply num to increase the spawn count
         float customMultiplier = 2.0f;  // Adjust this multiplier as needed
         num = (int)(num * customMultiplier);
 
-        // Optionally, log the new number of scrap items
-        Logger2.Log($"New number of scrap to spawn: {num}");
-        
-        // If you want to adjust the individual scrap values as well, you can modify the list here:
-        for (int i = 0; i < ScrapToSpawn.Count; i++)
+        // Use reflection to set scrapValue if the Item class doesn't expose it directly
+        foreach (var item in ScrapToSpawn)
         {
-            // Example of modifying scrap value, multiplying by a factor
-            ScrapToSpawn[i].scrapValue = (int)(ScrapToSpawn[i].scrapValue * customMultiplier);  // Multiply individual scrap value
+            FieldInfo scrapValueField = item.GetType().GetField("scrapValue", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (scrapValueField != null)
+            {
+                int currentScrapValue = (int)scrapValueField.GetValue(item);
+                scrapValueField.SetValue(item, currentScrapValue * customMultiplier);
+            }
         }
 
         // Modify the list of scrap values, if needed
@@ -238,7 +237,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         // Adjust num4 if necessary (total scrap value), for example:
         float totalValueMultiplier = 1.5f;  // Example multiplier for total value
         num4 = (int)(num4 * totalValueMultiplier);
-        Logger2.Log($"Adjusted total value of spawned scrap: {num4}");
+        Logger2.LogDebug($"Adjusted total value of spawned scrap: {num4}");
     } 
 
     //old
