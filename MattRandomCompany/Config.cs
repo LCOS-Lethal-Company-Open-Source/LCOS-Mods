@@ -103,7 +103,7 @@ namespace RandomCompany
 
             healthRegenMulLower = cfg.Bind<float>("General.PlayerCharacteristics", "HealthRegenTimerLowerBound", 1, "The Minimum Health Regen Timer Multiplier : larger regen timer means slower health regen");
             healthRegenMulUpper = cfg.Bind<float>("General.PlayerCharacteristics", "HealthRegenTimerUpperBound", 1, "The Maximum Health Regen Timer Multiplier : larger regen timer means slower health regen");
-            healthRegenMulEnabled = cfg.Bind<bool>("General.PlayerCharacteristics", "HealthRegenTimerEnabled", true, "Enables Health Regen Timer Multiplier ... true : enabled ... false : disabled);
+            healthRegenMulEnabled = cfg.Bind<bool>("General.PlayerCharacteristics", "HealthRegenTimerEnabled", true, "Enables Health Regen Timer Multiplier ... true : enabled ... false : disabled");
 
             ClearOrphanedEntries(cfg);
 

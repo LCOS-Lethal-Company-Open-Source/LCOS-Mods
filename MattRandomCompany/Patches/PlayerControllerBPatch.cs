@@ -116,7 +116,7 @@ namespace RandomCompany.Patches
                 healthRegenMulUpper = Config.Instance.healthRegenMulUpper.Value;
                 healthRegenMulEnabled = Config.Instance.healthRegenMulEnabled.Value;
                 healthMultiplied = false;
-                if(healthRegenMulLower > healthRegenMulUpper || !healthRegenMulEnabled)) {
+                if(healthRegenMulLower > healthRegenMulUpper || !healthRegenMulEnabled) {
                     healthRegenMulLower = 1;
                     healthRegenMulUpper = 1;
                 }
