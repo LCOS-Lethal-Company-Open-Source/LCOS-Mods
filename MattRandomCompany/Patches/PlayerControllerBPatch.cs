@@ -43,6 +43,12 @@ namespace RandomCompany.Patches
         private static float insanityMulUpper;
         private static bool insanityMulEnabled;
 
+        private static float healthRegenMul;
+        private static float healthRegenMulUpper;
+        private static float healthRegenMulLower;
+        private static bool healthRegenMulEnabled;
+        private static bool healthMultiplied;
+
         public PlayerControllerBPatch()
         {
             random = new Random();
@@ -103,6 +109,17 @@ namespace RandomCompany.Patches
                     insanityMulLower = 1;
                     insanityMulUpper = 1;
                 }
+
+                // Load health regen values
+                healthRegenMul = 0;
+                healthRegenMulLower = Config.Instance.healthRegenMulLower.Value;
+                healthRegenMulUpper = Config.Instance.healthRegenMulUpper.Value;
+                healthRegenMulEnabled = Config.Instance.healthRegenMulEnabled.Value;
+                healthMultiplied = false;
+                if(healthRegenMulLower > healthRegenMulUpper || !healthRegenMulEnabled)) {
+                    healthRegenMulLower = 1;
+                    healthRegenMulUpper = 1;
+                }
             }
             catch(Exception ex)
             {
@@ -156,6 +173,29 @@ namespace RandomCompany.Patches
             }
             __instance.insanitySpeedMultiplier = insanityMul;
 
+        }
+
+
+        [HarmonyPatch("LateUpdate")]
+        [HarmonyPostfix]
+        static void RandomizeLateUpdatePatch(PlayerControllerB __instance)
+        {
+            random = new Random();
+
+            // Apply health regen timer multiplier
+            if(healthRegenMul == 0)
+            {
+                healthRegenMul = healthRegenMulLower + (float)(random.NextDouble() * (healthRegenMulUpper - healthRegenMulLower));
+            }
+            if(__instance.healthRegenerateTimer == 1 && !healthMultiplied)
+            {
+                __instance.healthRegenerateTimer *= healthRegenMul;
+                healthMultiplied = true;
+            }
+            if(__instance.healthRegenerateTimer < 1)
+            {
+                healthMultiplied = false;
+            }
         }
 
         [HarmonyPostfix]

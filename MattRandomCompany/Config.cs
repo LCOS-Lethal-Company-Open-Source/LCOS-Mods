@@ -55,6 +55,10 @@ namespace RandomCompany
         public readonly ConfigEntry<float> insanityMulUpper;
         public readonly ConfigEntry<bool> insanityMulEnabled;
 
+        public readonly ConfigEntry<float> healthRegenMulLower;
+        public readonly ConfigEntry<float> healthRegenMulUpper;
+        public readonly ConfigEntry<bool> healthRegenMulEnabled;
+
         public Config(ConfigFile cfg) {
             InitInstance(this);
             cfg.SaveOnConfigSet = false;
@@ -96,7 +100,11 @@ namespace RandomCompany
             insanityMulLower = cfg.Bind<float>("General.PlayerCharacteristics", "InsanitySpeedMultiplierLowerBound", 1, "The Minimum Insanity Speed Multiplier");
             insanityMulUpper = cfg.Bind<float>("General.PlayerCharacteristics", "InsanitySpeedMultiplierUpperBound", 1, "The Maximum Insanity Speed Multiplier");
             insanityMulEnabled = cfg.Bind<bool>("General.PlayerCharacteristics.Toggles", "InsanitySpeedMultiplierEnabled", true, "Enables Insanity Speed Multiplier ... true : enabled ... false : disabled");
-            
+
+            healthRegenMulLower = cfg.Bind<float>("General.PlayerCharacteristics", "HealthRegenTimerLowerBound", 1, "The Minimum Health Regen Timer Multiplier : larger regen timer means slower health regen");
+            healthRegenMulUpper = cfg.Bind<float>("General.PlayerCharacteristics", "HealthRegenTimerUpperBound", 1, "The Maximum Health Regen Timer Multiplier : larger regen timer means slower health regen");
+            healthRegenMulEnabled = cfg.Bind<bool>("General.PlayerCharacteristics", "HealthRegenTimerEnabled", true, "Enables Health Regen Timer Multiplier ... true : enabled ... false : disabled);
+
             ClearOrphanedEntries(cfg);
 
             cfg.Save();

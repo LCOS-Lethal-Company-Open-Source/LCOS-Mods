@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BepInEx.Configuration;
+using GameNetcodeStuff;
 
 namespace RandomCompany.Patches
 {
@@ -12,6 +13,8 @@ namespace RandomCompany.Patches
     internal class RoundManagerPatch
     {
         private static System.Random random;
+
+        // 
 
         private static float scrapSpawnMul;
         private static float scrapSpawnMulLower; // minimum value for min and max scrap multiplier
@@ -54,7 +57,8 @@ namespace RandomCompany.Patches
             factorySizeMulLower = Config.Instance.factorySizeMulLower.Value;
             factorySizeMulUpper = Config.Instance.factorySizeMulUpper.Value;
             factorySizeMulEnabled = Config.Instance.factorySizeMulEnabled.Value;
-            if(factorySizeMulLower > factorySizeMulUpper || !factorySizeMulEnabled) {
+            if (factorySizeMulLower > factorySizeMulUpper || !factorySizeMulEnabled)
+            {
                 factorySizeMulLower = 1;
                 factorySizeMulUpper = 1;
             }
@@ -69,21 +73,26 @@ namespace RandomCompany.Patches
             random = new Random();
 
             // Apply scrap spawn multiplier
-            if(scrapSpawnMul == 0)
+            if (scrapSpawnMul == 0)
             {
                 scrapSpawnMul = __instance.scrapAmountMultiplier * (scrapSpawnMulLower + (float)(random.NextDouble() * (scrapSpawnMulUpper - scrapSpawnMulLower)));
             }
             __instance.scrapAmountMultiplier = scrapSpawnMul;
 
             // Apply scrap value multiplier
-            if(scrapValueMul == 0)
+            if (scrapValueMul == 0)
             {
                 scrapValueMul = __instance.scrapValueMultiplier * (scrapValueMulLower + (float)(random.NextDouble() * (scrapValueMulUpper - scrapValueMulLower)));
             }
             __instance.scrapValueMultiplier = scrapValueMul;
+        }
 
+        [HarmonyPatch(nameof(RoundManager.GenerateNewFloor))]
+        [HarmonyPrefix]
+        static void RandomizeGenerateNewFloorPatch(ref RoundManager __instance)
+        {
             // Apply factory size multiplier
-            if(factorySizeMul == 0)
+            if (factorySizeMul == 0)
             {
                 factorySizeMul = __instance.currentLevel.factorySizeMultiplier * (factorySizeMulLower + (float)(random.NextDouble() * (factorySizeMulUpper - factorySizeMulLower)));
             }
