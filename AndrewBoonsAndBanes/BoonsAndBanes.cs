@@ -10,7 +10,7 @@ using static TerminalApi.TerminalApi;
 using System.Collections.Generic;  // Required for IEnumerable<T>
 using System.Reflection.Emit;
 using UnityEngine.Animations.Rigging;  // Required for OpCodes
-
+using UnityEngine;
 
 namespace BoonsAndBanes;
 
@@ -26,6 +26,7 @@ public class BoonsAndBanes : BaseUnityPlugin
     internal static TerminalCommandFunctions CommandData = new TerminalCommandFunctions();
 
     public static float currentDaySpeedMultiplier = 1.0f;  // Default multiplier
+    public static float enemyHealthMultiplyer = 1.0f;
 
     private void Awake()
     {
@@ -85,6 +86,23 @@ public class BoonsAndBanes : BaseUnityPlugin
                         new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch")));
                     
                     return $"Day speed multiplier increased to {currentDaySpeedMultiplier}!";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("Bane MultiplyEnemyHealth", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    // Increment the multiplier by 1.0f (you can adjust the increment value)
+                    enemyHealthMultiplyer += 1.0f;  
+                    Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
+
+                    // Apply the updated multiplier using Harmony
+                    Harmony.Patch(typeof(EnemyAI),
+                        new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply")));
+                    
+                    return $"EnemyHealth Multiplied to  {currentDaySpeedMultiplier}!";
                 },
                 Category = "BoonsAndBanesMod"
             });
@@ -151,6 +169,15 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     [HarmonyPostfix]
     static void doubleSellValue() {
         StartOfRound.Instance.companyBuyingRate *= 2;
+    }
+
+    [HarmonyPatch(typeof(EnemyAI))]
+    [HarmonyPrefix]
+    public static void EnemyHealthMultiply(ref float health)
+    {
+        // Apply multiplier to the damage value (or HP value)
+        float multiplier = 2.0f;  // Example: double the HP
+        health *= multiplier;  // Multiply the damage (or HP value)
     }
 
     // no reason for why this is broken???
@@ -280,5 +307,25 @@ class ScrapMultiplier(){
     public static void ResetMultiplier()
     {
         value = 1.0f;
+    }
+}
+
+public class EnemyManager : MonoBehaviour
+{
+    // Function to multiply all enemy HP by a specified multiplier
+    public static void MultiplyAllEnemiesHP(int multiplier)
+    {
+        // Find all EnemyAI objects in the scene
+        EnemyAI[] allEnemies = FindObjectsOfType<EnemyAI>();
+
+        // Loop through each enemy and multiply their HP
+        foreach (EnemyAI enemy in allEnemies)
+        {
+            if (enemy != null)  // Make sure the enemy exists
+            {
+                enemy.enemyHP *= multiplier;  // Multiply enemy HP by the multiplier
+                Debug.Log($"Enemy HP multiplied. New HP: {enemy.enemyHP}");
+            }
+        }
     }
 }
