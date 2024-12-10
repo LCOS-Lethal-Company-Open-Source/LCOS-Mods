@@ -8,7 +8,8 @@ using TerminalApi.Classes;
 using static TerminalApi.Events.Events;
 using static TerminalApi.TerminalApi;
 using System.Collections.Generic;  // Required for IEnumerable<T>
-using System.Reflection.Emit;  // Required for OpCodes
+using System.Reflection.Emit;
+using UnityEngine.Animations.Rigging;  // Required for OpCodes
 
 
 namespace BoonsAndBanes;
@@ -76,6 +77,7 @@ public class BoonsAndBanes : BaseUnityPlugin
                 {
                     // Increment the multiplier by 1.0f (you can adjust the increment value)
                     currentDaySpeedMultiplier += 1.0f;  
+                    ScrapMultiplier.IncreaseMultiplier(0.5f);
                     Logger.LogInfo($"Day speed multiplier increased to {currentDaySpeedMultiplier}");
 
                     // Apply the updated multiplier using Harmony
@@ -93,6 +95,7 @@ public class BoonsAndBanes : BaseUnityPlugin
                 {
                     // Unpatch the method
                     Harmony.Unpatch(typeof(TimeOfDay).GetMethod("ApplyDaySpeedMultiplier"), typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch"));
+                    ScrapMultiplier.DecreaseMultiplier(0.5f * currentDaySpeedMultiplier);
                     currentDaySpeedMultiplier = 0.0f;
 
                     Logger.LogInfo("Day speed multiplier patch removed!");
@@ -130,17 +133,18 @@ public class BoonsAndBanes : BaseUnityPlugin
 [BepInDependency("atomic.terminalapi", BepInDependency.DependencyFlags.HardDependency)]
 public class TerminalCommandFunctions : BaseUnityPlugin{
     internal new static ManualLogSource Logger2 { get; private set; } = null!;
-    int ScrapMultiplier = 1;
     string[] boonNames = ["ExtraLife"];
     string[] baneNames = ["HalfHealth", "OopsItsAllX", "FasterDayCycle"];
     string[] cheatNames = ["DoubleSellValue"];
+
+    ScrapMultiplier multi = new ScrapMultiplier();
 
     private void Awake(){
         Logger2 = base.Logger;
     }
 
-    public int getMultiplier(){
-        return ScrapMultiplier;
+    public float getMultiplier(){
+        return ScrapMultiplier.value;
     }
 
     [HarmonyPatch(typeof(TimeOfDay), "SetBuyingRateForDay")]
@@ -208,7 +212,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
     public static void Prefix(ref int num, ref List<Item> ScrapToSpawn, ref List<int> list)
     {
-        float customMultiplier = 2.0f;  // Adjust this multiplier as needed
+        float customMultiplier = ScrapMultiplier.value;  // Adjust this multiplier as needed
         num = (int)(num * customMultiplier);
 
         // Use reflection to set scrapValue if the Item class doesn't expose it directly
@@ -249,4 +253,32 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
 	    return (___globalTime + __instance.OffsetFromGlobalTime) * __instance.DaySpeedMultiplier * daytimeMultipler % (___totalTime + 1f);
     }
     */
+}
+
+//scuffed but shouldwork
+class ScrapMultiplier(){
+    public static float value = 1;
+
+    public static void IncreaseMultiplier(float factor)
+    {
+        value *= factor;
+    }
+
+    // This function decreases the multiplier by a specific factor (e.g., when a bane is applied)
+    public static void DecreaseMultiplier(float factor)
+    {
+        value /= factor;
+    }
+
+    // Method to set multiplier directly
+    public static void SetMultiplier(float newMultiplier)
+    {
+        value = newMultiplier;
+    }
+
+    // Method to reset multiplier to default value
+    public static void ResetMultiplier()
+    {
+        value = 1.0f;
+    }
 }
