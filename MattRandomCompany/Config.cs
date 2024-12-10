@@ -17,6 +17,7 @@ namespace RandomCompany
     {
 
         //Scrap
+
         public readonly ConfigEntry<float> scrapSpawnMulLower;
         public readonly ConfigEntry<float> scrapSpawnMulUpper;
         public readonly ConfigEntry<bool> scrapSpawnMulEnabled;
@@ -24,6 +25,13 @@ namespace RandomCompany
         public readonly ConfigEntry<float> scrapValueMulLower;
         public readonly ConfigEntry<float> scrapValueMulUpper;
         public readonly ConfigEntry<bool> scrapValueMulEnabled;
+
+
+        // Factory
+
+        public readonly ConfigEntry<float> factorySizeMulLower;
+        public readonly ConfigEntry<float> factorySizeMulUpper;
+        public readonly ConfigEntry<bool> factorySizeMulEnabled;
 
         //Player Controller
 
@@ -56,6 +64,12 @@ namespace RandomCompany
             scrapValueMulLower = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierLowerBound", 1, "The Minimum Scrap Value Multiplier");
             scrapValueMulUpper = cfg.Bind<float>("General.Scrap", "ScrapValueMultiplierUpperBound", 1, "The Maximum Scrap Value Multiplier");
             scrapValueMulEnabled = cfg.Bind<bool>("General.Scrap.Toggles", "ScrapValueMultiplierEnabled", true, "Enables Scrap Value Multiplier ... true : enabled ... false : disabled");
+
+            // Factory
+
+            factorySizeMulLower = cfg.Bind<float>("General.Factory", "FactorySizeMultiplierLowerBound", 1, "The Minimum Factory Size Multiplier");
+            factorySizeMulUpper = cfg.Bind<float>("General.Factory", "FactorySizeMultiplierUpperBound", 1, "The Maximum Factory Size Multiplier");
+            factorySizeMulEnabled = cfg.Bind<bool>("General.Factory.Toggles", "FactorySizeMultipierEnabled", true, "Enables Factory Size Multiplier ... true : enabled ... false : disabled");
 
             // Player Controller
 

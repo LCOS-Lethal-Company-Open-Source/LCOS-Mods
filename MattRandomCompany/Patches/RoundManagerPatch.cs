@@ -23,13 +23,18 @@ namespace RandomCompany.Patches
         private static float scrapValueMulUpper; // maximum value for scrap value multiplier
         private static bool scrapValueMulEnabled;
 
+        private static float factorySizeMul;
+        private static float factorySizeMulLower;
+        private static float factorySizeMulUpper;
+        private static bool factorySizeMulEnabled;
+
         public RoundManagerPatch()
         {
             scrapSpawnMul = 0;
             scrapSpawnMulLower = Config.Instance.scrapSpawnMulLower.Value;
             scrapSpawnMulUpper = Config.Instance.scrapSpawnMulUpper.Value;
             scrapSpawnMulEnabled = Config.Instance.scrapSpawnMulEnabled.Value;
-            if (scrapSpawnMulLower > scrapSpawnMulUpper || !Config.Instance.scrapSpawnMulEnabled.Value)
+            if (scrapSpawnMulLower > scrapSpawnMulUpper || !scrapSpawnMulEnabled)
             {
                 scrapSpawnMulLower = 1;
                 scrapSpawnMulUpper = 1;
@@ -39,10 +44,19 @@ namespace RandomCompany.Patches
             scrapValueMulLower = Config.Instance.scrapValueMulLower.Value;
             scrapValueMulUpper = Config.Instance.scrapValueMulUpper.Value;
             scrapValueMulEnabled = Config.Instance.scrapValueMulEnabled.Value;
-            if (scrapValueMulLower > scrapValueMulUpper || !Config.Instance.scrapValueMulEnabled.Value)
+            if (scrapValueMulLower > scrapValueMulUpper || !scrapValueMulEnabled)
             {
                 scrapValueMulLower = 1;
                 scrapValueMulUpper = 1;
+            }
+
+            factorySizeMul = 0;
+            factorySizeMulLower = Config.Instance.factorySizeMulLower.Value;
+            factorySizeMulUpper = Config.Instance.factorySizeMulUpper.Value;
+            factorySizeMulEnabled = Config.Instance.factorySizeMulEnabled.Value;
+            if(factorySizeMulLower > factorySizeMulUpper || !factorySizeMulEnabled) {
+                factorySizeMulLower = 1;
+                factorySizeMulUpper = 1;
             }
         }
 
@@ -67,6 +81,13 @@ namespace RandomCompany.Patches
                 scrapValueMul = __instance.scrapValueMultiplier * (scrapValueMulLower + (float)(random.NextDouble() * (scrapValueMulUpper - scrapValueMulLower)));
             }
             __instance.scrapValueMultiplier = scrapValueMul;
+
+            // Apply factory size multiplier
+            if(factorySizeMul == 0)
+            {
+                factorySizeMul = __instance.currentLevel.factorySizeMultiplier * (factorySizeMulLower + (float)(random.NextDouble() * (factorySizeMulUpper - factorySizeMulLower)));
+            }
+            __instance.currentLevel.factorySizeMultiplier = factorySizeMul;
         }
     }
 }
