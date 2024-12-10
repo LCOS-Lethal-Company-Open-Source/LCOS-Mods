@@ -95,7 +95,7 @@ public class BoonsAndBanes : BaseUnityPlugin
                     // Unpatch the method
                     Harmony.Unpatch(typeof(TimeOfDay).GetMethod("ApplyDaySpeedMultiplier"), typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch"));
                     currentDaySpeedMultiplier = 0.0f;
-                    
+
                     Logger.LogInfo("Day speed multiplier patch removed!");
 
                     return "Day speed multiplier patch removed, restoring original behavior.";
@@ -204,7 +204,42 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
             }
         }
 
+        // This will be called before the SpawnScrapInLevel method is executed.
+    [HarmonyPatch(typeof(TerminalCommandFunctions))]  // Replace with the class containing SpawnScrapInLevel
+    [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
+    public static void Prefix(ref int num, ref List<Item> ScrapToSpawn, ref List<int> list)
+    {
+        // Multiply num to increase the spawn count
+        float customMultiplier = 2.0f;  // Adjust this multiplier as needed
+        num = (int)(num * customMultiplier);
+
+        // Optionally, log the new number of scrap items
+        Logger2.Log($"New number of scrap to spawn: {num}");
         
+        // If you want to adjust the individual scrap values as well, you can modify the list here:
+        for (int i = 0; i < ScrapToSpawn.Count; i++)
+        {
+            // Example of modifying scrap value, multiplying by a factor
+            ScrapToSpawn[i].scrapValue = (int)(ScrapToSpawn[i].scrapValue * customMultiplier);  // Multiply individual scrap value
+        }
+
+        // Modify the list of scrap values, if needed
+        for (int i = 0; i < list.Count; i++)
+        {
+            list[i] = (int)(list[i] * customMultiplier);  // Multiply individual scrap value in list
+        }
+    }
+
+    // Optional: Adjust logic after spawn if needed, e.g., multiplying values at the end
+    [HarmonyPatch(typeof(TerminalCommandFunctions))]  // Replace with the class containing SpawnScrapInLevel
+    [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
+    public static void Postfix(ref List<int> list, ref int num4)
+    {
+        // Adjust num4 if necessary (total scrap value), for example:
+        float totalValueMultiplier = 1.5f;  // Example multiplier for total value
+        num4 = (int)(num4 * totalValueMultiplier);
+        Logger2.Log($"Adjusted total value of spawned scrap: {num4}");
+    } 
 
     //old
 
