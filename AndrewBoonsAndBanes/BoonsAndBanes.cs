@@ -219,27 +219,6 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         health *= multiplier;  // Multiply the damage (or HP value)
     }
 
-    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
-    [HarmonyPrefix]
-    public static void DwellerNightmare(CaveDwellerAI __instance){
-        __instance.chaseSpeed *= 2;
-        __instance.leapSpeed *= 2;
-    }
-
-    // no reason for why this is broken???
-    /*
-    [HarmonyPatch(typeof(PlayerControllerB), "Update")]
-    [HarmonyPostfix]
-    static void halfMaxHealth(PlayerControllerB __instance){
-            if (__instance.health > 50){
-                __instance.health = 50;
-            };
-    }
-    */
-
-   
-
-
         // The field that stores the DaySpeedMultiplier in SelectableLevel
         static FieldInfo f_daySpeedMultiplier = AccessTools.Field(typeof(SelectableLevel), "DaySpeedMultiplier");
 
@@ -313,6 +292,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         Logger2.LogDebug($"Adjusted total value of spawned scrap: {num4}");
     } 
 
+    // Increases enemy cap for enemys spawning after every round
     [HarmonyPatch(typeof(RoundManager))]
     [HarmonyPostfix]
     public static void EnemyCapAfterStartOfRound(RoundManager __instance){
@@ -320,6 +300,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         __instance.currentMaxInsidePower *= 2;
     }
 
+    // Increases the Enemy cap for the inital enemy spawning
     [HarmonyPatch(typeof(SelectableLevel))]
     [HarmonyPostfix]
     public static void EnemyCap(SelectableLevel __instance){
@@ -327,7 +308,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     }
 }
 
-//scuffed but shouldwork
+//scuffed method to multiply the scrap gain
 class ScrapMultiplier(){
     public static float value = 1;
 
@@ -370,6 +351,92 @@ public class EnemyManager : MonoBehaviour
             {
                 enemy.enemyHP *= multiplier;  // Multiply enemy HP by the multiplier
                 Debug.Log($"Enemy HP multiplied. New HP: {enemy.enemyHP}");
+            }
+        }
+    }
+}
+
+
+[HarmonyPatch]
+public class DwellerNightmare
+{
+    // Adjust enemy speed in different behavior states
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPrefix]
+    public static void AdjustEnemySpeed(ref float __state, CaveDwellerAI __instance)
+    {
+        // Example of changing speed based on state
+        switch (__instance.currentBehaviourStateIndex)
+        {
+            case 1: // State 1 - Chasing
+                __instance.agent.speed = 8f; // Increase speed when chasing
+                break;
+            case 2: // State 2 - Sneaking
+                __instance.agent.speed = 5f; // Increased sneak speed
+                break;
+            case 3: // State 3 - Leaping
+                __instance.agent.speed = 10f; // Increase leap speed
+                break;
+        }
+    }
+
+    // Shorten the scream timer to make the Dweller scream more often
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPostfix]
+    public static void ShortenScreamTimer(ref float screamTimer, CaveDwellerAI __instance)
+    {
+        if (__instance.screamTimer > 0f)
+        {
+            screamTimer -= Time.deltaTime * 1.5f; // Make the scream timer decrease faster
+        }
+    }
+
+    // Increase the detection range for line of sight
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPrefix]
+    public static bool IncreaseDetectionRange(ref bool __result, Vector3 targetPosition, CaveDwellerAI __instance)
+    {
+        // Increase the line of sight range
+        float increasedRange = 150f; // Increase range to 150 units
+        __result = __instance.GameNetworkManager.Instance.localPlayerController.HasLineOfSightToPosition(targetPosition, increasedRange, 30, 3f);
+        return false; // Prevent the original method from running
+    }
+
+    // Make it harder for the Dweller to escape
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPrefix]
+    public static bool MakeEscapeHarder(ref bool __result, CaveDwellerAI __instance)
+    {
+        __result = false; // Make the Dweller never get trapped
+        return false; // Prevent the original method from running
+    }
+
+    // Faster transition to leaping or chasing state
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPostfix]
+    public static void FasterLeapAndChase(ref bool leaping, ref bool chasingAfterLeap, CaveDwellerAI __instance)
+    {
+        if (__instance.screamTimer <= 0f && !leaping && !chasingAfterLeap)
+        {
+            // Make the Dweller more likely to enter the leaping or chasing state
+            leaping = true; // Force a leap immediately
+        }
+    }
+
+    // Additional aggressive behavior (optional)
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPrefix]
+    public static void IncreaseAggression(CaveDwellerAI __instance)
+    {
+        // Making the Dweller more aggressive
+        if (__instance.targetPlayer != null)
+        {
+            float playerDistance = Vector3.Distance(__instance.transform.position, __instance.targetPlayer.transform.position);
+            if (playerDistance < 15f) // Closer proximity triggers a more aggressive response
+            {
+                __instance.currentBehaviourStateIndex = 3; // Switch to aggressive state
+                __instance.screaming = true;
+                __instance.creatureVoice.PlayOneShot(__instance.growlSFX);
             }
         }
     }
