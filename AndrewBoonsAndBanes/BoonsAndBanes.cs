@@ -139,6 +139,31 @@ public class BoonsAndBanes : BaseUnityPlugin
                 Category = "BoonsAndBanesMod"
             });
 
+            AddCommand("Bane IncreaseEnemyCap", new CommandInfo(){
+            
+                DisplayTextSupplier = () =>
+	            {
+                    
+                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCapAfterStartOfRound")));
+                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCap")));
+
+                    ScrapMultiplier.IncreaseMultiplier(0.3f * currentDaySpeedMultiplier); 
+		            return "Doubling Enemy Spawn Cap";
+	            },
+	            Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("RemoveBane DoubleSellValue", new CommandInfo(){
+            
+                DisplayTextSupplier = () =>
+	            {
+                    Harmony.Unpatch(typeof(TerminalCommandFunctions).GetMethod("EnemyCapAfterStartOfRound"), HarmonyPatchType.Prefix);
+                    Harmony.Unpatch(typeof(TerminalCommandFunctions).GetMethod("EnemyCap"), HarmonyPatchType.Prefix);
+		            return "No Longer increasing Enemy Spawn Cap";
+	            },
+	            Category = "BoonsAndBanesMod"
+            });
+
 
             AddCommand("Cheat DoubleSellValue", new CommandInfo(){
             
@@ -251,7 +276,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         }
 
         // This will be called before the SpawnScrapInLevel method is executed.
-    [HarmonyPatch(typeof(TerminalCommandFunctions))]  // Replace with the class containing SpawnScrapInLevel
+    [HarmonyPatch(typeof(RoundManager))]  // Replace with the class containing SpawnScrapInLevel
     [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
     public static void Prefix(ref int num, ref List<Item> ScrapToSpawn, ref List<int> list)
     {
@@ -277,7 +302,7 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     }
 
     // Optional: Adjust logic after spawn if needed, e.g., multiplying values at the end
-    [HarmonyPatch(typeof(TerminalCommandFunctions))]  // Replace with the class containing SpawnScrapInLevel
+    [HarmonyPatch(typeof(RoundManager))]  // Replace with the class containing SpawnScrapInLevel
     [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
     public static void Postfix(ref List<int> list, ref int num4)
     {
@@ -287,6 +312,18 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         Logger2.LogDebug($"Adjusted total value of spawned scrap: {num4}");
     } 
 
+    [HarmonyPatch(typeof(RoundManager))]
+    [HarmonyPostfix]
+    public static void EnemyCapAfterStartOfRound(RoundManager __instance, int multiplier){
+        __instance.currentMaxOutsidePower *= multiplier;
+        __instance.currentMaxInsidePower *= multiplier;
+    }
+
+    [HarmonyPatch(typeof(SelectableLevel))]
+    [HarmonyPostfix]
+    public static void EnemyCap(SelectableLevel __instance, int multiplier){
+        __instance.maxEnemyPowerCount *= multiplier;
+    }
     //old
 
     /*
