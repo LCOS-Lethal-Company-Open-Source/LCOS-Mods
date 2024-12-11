@@ -105,6 +105,40 @@ public class BoonsAndBanes : BaseUnityPlugin
                 Category = "BoonsAndBanesMod"
             });
 
+            AddCommand("Bane NightmareDweller", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    Logger.LogInfo($"Cave Dwelleres are now alot harder");
+                    ScrapMultiplier.IncreaseMultiplier(1.0f);
+
+                    Harmony.PatchAll(typeof(DwellerNightmare));
+                    
+                    return $"Cave Dwelleres are now alot harder!";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("RemoveBane NightmareDweller", new CommandInfo()
+            {
+                DisplayTextSupplier = () =>
+                {
+                    Logger.LogInfo($"Cave Dweller AI back to normal");
+                    ScrapMultiplier.DecreaseMultiplier(1.0f);
+
+                    // This sucks but will have to do...
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("AdjustEnemySpeed"));
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("DoNonBabyUpdateLogic"));
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("IncreaseDetectionRange"));
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("MakeEscapeHarder"));
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("FasterLeapAndChase"));
+                    Harmony.Unpatch(typeof(CaveDwellerAI).GetMethod("DoNonBabyUpdateLogic"), typeof(DwellerNightmare).GetMethod("IncreaseAggression"));
+
+                    return $"Cave Dweller AI back to normal";
+                },
+                Category = "BoonsAndBanesMod"
+            });
+
             AddCommand("RemoveBane MultiplyEnemyHealth", new CommandInfo()
             {
                 DisplayTextSupplier = () =>
@@ -398,7 +432,7 @@ public class DwellerNightmare
     {
         // Increase the line of sight range
         float increasedRange = 150f; // Increase range to 150 units
-        __result = __instance.GameNetworkManager.Instance.localPlayerController.HasLineOfSightToPosition(targetPosition, increasedRange, 30, 3f);
+        __result = GameNetworkManager.Instance.localPlayerController.HasLineOfSightToPosition(targetPosition, increasedRange, 30, 3f);
         return false; // Prevent the original method from running
     }
 
