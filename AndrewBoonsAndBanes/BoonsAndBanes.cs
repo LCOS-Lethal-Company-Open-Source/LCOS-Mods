@@ -2,14 +2,10 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using Steamworks.ServerList;
-using TerminalApi;
 using TerminalApi.Classes;
-using static TerminalApi.Events.Events;
 using static TerminalApi.TerminalApi;
 using System.Collections.Generic;  // Required for IEnumerable<T>
 using System.Reflection.Emit;
-using UnityEngine.Animations.Rigging;  // Required for OpCodes
 using UnityEngine;
 
 namespace BoonsAndBanes;
@@ -53,7 +49,8 @@ public class BoonsAndBanes : BaseUnityPlugin
     }
 
     private void TerminalCommands(){
-        // may not be needed
+        // adds commands to the terminal so that the player can easily add
+        // or remove the boons and banes
             Harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
 
             AddCommand("ScrapMultiplier", new CommandInfo()
@@ -97,8 +94,9 @@ public class BoonsAndBanes : BaseUnityPlugin
                     // Increment the multiplier by 1.0f (you can adjust the increment value)
                     enemyHealthMultiplyer += 1.0f;  
                     Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
+                    ScrapMultiplier.IncreaseMultiplier(0.4f);
 
-                    // Apply the updated multiplier using Harmony
+
                     Harmony.Patch(typeof(EnemyAI).GetMethod("EnemyAI"),
                         new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply")));
                     
@@ -111,11 +109,10 @@ public class BoonsAndBanes : BaseUnityPlugin
             {
                 DisplayTextSupplier = () =>
                 {
-                    // Increment the multiplier by 1.0f (you can adjust the increment value)
                     enemyHealthMultiplyer -= 1.0f;  
                     Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
+                    ScrapMultiplier.DecreaseMultiplier(0.4f);
 
-                    // Apply the updated multiplier using Harmony
                     Harmony.Unpatch(typeof(EnemyAI).GetMethod("EnemyAI"), typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply"));
                     
                     return $"EnemyHealth Multiplied to  {currentDaySpeedMultiplier}!";
@@ -123,7 +120,7 @@ public class BoonsAndBanes : BaseUnityPlugin
                 Category = "BoonsAndBanesMod"
             });
 
-            AddCommand("Bane RemoveDaySpeedMultiplierPatch", new CommandInfo()
+            AddCommand("RemoveBane DaySpeedMultiplierPatch", new CommandInfo()
             {
                 DisplayTextSupplier = () =>
                 {
@@ -153,7 +150,7 @@ public class BoonsAndBanes : BaseUnityPlugin
 	            Category = "BoonsAndBanesMod"
             });
 
-            AddCommand("RemoveBane DoubleSellValue", new CommandInfo(){
+            AddCommand("RemoveBane IncreaseEnemyCap", new CommandInfo(){
             
                 DisplayTextSupplier = () =>
 	            {
@@ -191,6 +188,7 @@ public class BoonsAndBanes : BaseUnityPlugin
 //[BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency("atomic.terminalapi", BepInDependency.DependencyFlags.HardDependency)]
 public class TerminalCommandFunctions : BaseUnityPlugin{
+    //collection of functions that actually change the code of the game
     internal new static ManualLogSource Logger2 { get; private set; } = null!;
     string[] boonNames = ["ExtraLife"];
     string[] baneNames = ["HalfHealth", "OopsItsAllX", "FasterDayCycle"];
@@ -221,6 +219,13 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         health *= multiplier;  // Multiply the damage (or HP value)
     }
 
+    [HarmonyPatch(typeof(CaveDwellerAI), "DoNonBabyUpdateLogic")]
+    [HarmonyPrefix]
+    public static void DwellerNightmare(CaveDwellerAI __instance){
+        __instance.chaseSpeed *= 2;
+        __instance.leapSpeed *= 2;
+    }
+
     // no reason for why this is broken???
     /*
     [HarmonyPatch(typeof(PlayerControllerB), "Update")]
@@ -232,11 +237,10 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
     }
     */
 
-    //float globalTime = Traverse.Create(typeof(TimeOfDay)).Field("globalTime").GetValue() as float;
-    //float totalTime = Traverse.Create(typeof(TimeOfDay)).Field("totalTime").GetValue() as float;
+   
 
 
-             // The field that stores the DaySpeedMultiplier in SelectableLevel
+        // The field that stores the DaySpeedMultiplier in SelectableLevel
         static FieldInfo f_daySpeedMultiplier = AccessTools.Field(typeof(SelectableLevel), "DaySpeedMultiplier");
 
         // The method we want to call to apply a custom multiplier to DaySpeedMultiplier
@@ -275,15 +279,14 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
             }
         }
 
-        // This will be called before the SpawnScrapInLevel method is executed.
-    [HarmonyPatch(typeof(RoundManager))]  // Replace with the class containing SpawnScrapInLevel
-    [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
+    // This will be called before the SpawnScrapInLevel method is executed.
+    [HarmonyPatch(typeof(RoundManager))] 
+    [HarmonyPatch("SpawnScrapInLevel")]   
     public static void Prefix(ref int num, ref List<Item> ScrapToSpawn, ref List<int> list)
     {
-        float customMultiplier = ScrapMultiplier.value;  // Adjust this multiplier as needed
+        float customMultiplier = ScrapMultiplier.value; 
         num = (int)(num * customMultiplier);
 
-        // Use reflection to set scrapValue if the Item class doesn't expose it directly
         foreach (var item in ScrapToSpawn)
         {
             FieldInfo scrapValueField = item.GetType().GetField("scrapValue", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -301,38 +304,27 @@ public class TerminalCommandFunctions : BaseUnityPlugin{
         }
     }
 
-    // Optional: Adjust logic after spawn if needed, e.g., multiplying values at the end
-    [HarmonyPatch(typeof(RoundManager))]  // Replace with the class containing SpawnScrapInLevel
-    [HarmonyPatch("SpawnScrapInLevel")]    // The method you want to patch
+    [HarmonyPatch(typeof(RoundManager))]  
+    [HarmonyPatch("SpawnScrapInLevel")]    
     public static void Postfix(ref List<int> list, ref int num4)
     {
-        // Adjust num4 if necessary (total scrap value), for example:
-        float totalValueMultiplier = 1.5f;  // Example multiplier for total value
+        float totalValueMultiplier = 1.5f; 
         num4 = (int)(num4 * totalValueMultiplier);
         Logger2.LogDebug($"Adjusted total value of spawned scrap: {num4}");
     } 
 
     [HarmonyPatch(typeof(RoundManager))]
     [HarmonyPostfix]
-    public static void EnemyCapAfterStartOfRound(RoundManager __instance, int multiplier){
-        __instance.currentMaxOutsidePower *= multiplier;
-        __instance.currentMaxInsidePower *= multiplier;
+    public static void EnemyCapAfterStartOfRound(RoundManager __instance){
+        __instance.currentMaxOutsidePower *= 2;
+        __instance.currentMaxInsidePower *= 2;
     }
 
     [HarmonyPatch(typeof(SelectableLevel))]
     [HarmonyPostfix]
-    public static void EnemyCap(SelectableLevel __instance, int multiplier){
-        __instance.maxEnemyPowerCount *= multiplier;
+    public static void EnemyCap(SelectableLevel __instance){
+        __instance.maxEnemyPowerCount *= 2;
     }
-    //old
-
-    /*
-    static int FasterDayCycle(SelectableLevel __instance, float ___globalTime, float ___totalTime, int daytimeMultipler = 2)
-    {
-         __instance.DaySpeedMultiplier * = 
-	    return (___globalTime + __instance.OffsetFromGlobalTime) * __instance.DaySpeedMultiplier * daytimeMultipler % (___totalTime + 1f);
-    }
-    */
 }
 
 //scuffed but shouldwork
