@@ -64,21 +64,34 @@ public class BoonsAndBanes : BaseUnityPlugin
             AddCommand("List Boons", new CommandInfo(){
                 DisplayTextSupplier = () =>
                 {
-                    return ":3";
+                    return "Nothing yet....";
+                },
+                Category = "BoonsAndBanesMod",
+            });
+            AddCommand("List Banes", new CommandInfo(){
+                DisplayTextSupplier = () =>
+                {
+                    return "IncreaseDaySpeed - increases day Speed\n, MultiplyEnemyMaxHealth - Doubles enemy Max Health\n, NightmareDweller - makes the cave Dweller alot harder\n, IncreaseEnemyCap - more enemies can spawn initally and more can appear in the moon\n";
+                },
+                Category = "BoonsAndBanesMod",
+            });
+            AddCommand("List Cheats", new CommandInfo(){
+                DisplayTextSupplier = () =>
+                {
+                    return "DoubleSellValue";
                 },
                 Category = "BoonsAndBanesMod",
             });
 
+            // increases the dayspeed making runs have to be alot faster
             AddCommand("Bane IncreaseDaySpeed", new CommandInfo()
             {
                 DisplayTextSupplier = () =>
                 {
-                    // Increment the multiplier by 1.0f (you can adjust the increment value)
                     currentDaySpeedMultiplier += 1.0f;  
                     ScrapMultiplier.IncreaseMultiplier(0.5f);
                     Logger.LogInfo($"Day speed multiplier increased to {currentDaySpeedMultiplier}");
 
-                    // Apply the updated multiplier using Harmony
                     Harmony.Patch(typeof(TimeOfDay).GetMethod("ApplyDaySpeedMultiplier"),
                         new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("ApplyDaySpeedMultiplierPatch")));
                     
@@ -87,11 +100,11 @@ public class BoonsAndBanes : BaseUnityPlugin
                 Category = "BoonsAndBanesMod"
             });
 
+            // doubles enemy max health
             AddCommand("Bane MultiplyEnemyHealth", new CommandInfo()
             {
                 DisplayTextSupplier = () =>
                 {
-                    // Increment the multiplier by 1.0f (you can adjust the increment value)
                     enemyHealthMultiplyer += 1.0f;  
                     Logger.LogInfo($"EnemyHealth Multiplied to {enemyHealthMultiplyer}");
                     ScrapMultiplier.IncreaseMultiplier(0.4f);
@@ -104,7 +117,8 @@ public class BoonsAndBanes : BaseUnityPlugin
                 },
                 Category = "BoonsAndBanesMod"
             });
-
+            
+            // makes cave dwellers harder
             AddCommand("Bane NightmareDweller", new CommandInfo()
             {
                 DisplayTextSupplier = () =>
@@ -117,6 +131,20 @@ public class BoonsAndBanes : BaseUnityPlugin
                     return $"Cave Dwelleres are now alot harder!";
                 },
                 Category = "BoonsAndBanesMod"
+            });
+
+            AddCommand("Bane IncreaseEnemyCap", new CommandInfo(){
+            
+                DisplayTextSupplier = () =>
+	            {
+                    
+                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCapAfterStartOfRound")));
+                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCap")));
+
+                    ScrapMultiplier.IncreaseMultiplier(0.3f * currentDaySpeedMultiplier); 
+		            return "Doubling Enemy Spawn Cap";
+	            },
+	            Category = "BoonsAndBanesMod"
             });
 
             AddCommand("RemoveBane NightmareDweller", new CommandInfo()
@@ -149,7 +177,7 @@ public class BoonsAndBanes : BaseUnityPlugin
 
                     Harmony.Unpatch(typeof(EnemyAI).GetMethod("EnemyAI"), typeof(TerminalCommandFunctions).GetMethod("EnemyHealthMultiply"));
                     
-                    return $"EnemyHealth Multiplied to  {currentDaySpeedMultiplier}!";
+                    return $"EnemyHealth Multiplied to {currentDaySpeedMultiplier}!";
                 },
                 Category = "BoonsAndBanesMod"
             });
@@ -168,20 +196,6 @@ public class BoonsAndBanes : BaseUnityPlugin
                     return "Day speed multiplier patch removed, restoring original behavior.";
                 },
                 Category = "BoonsAndBanesMod"
-            });
-
-            AddCommand("Bane IncreaseEnemyCap", new CommandInfo(){
-            
-                DisplayTextSupplier = () =>
-	            {
-                    
-                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCapAfterStartOfRound")));
-                    Harmony.Patch(typeof(RoundManager).GetMethod(""), new HarmonyMethod(typeof(TerminalCommandFunctions).GetMethod("EnemyCap")));
-
-                    ScrapMultiplier.IncreaseMultiplier(0.3f * currentDaySpeedMultiplier); 
-		            return "Doubling Enemy Spawn Cap";
-	            },
-	            Category = "BoonsAndBanesMod"
             });
 
             AddCommand("RemoveBane IncreaseEnemyCap", new CommandInfo(){
@@ -223,7 +237,7 @@ public class BoonsAndBanes : BaseUnityPlugin
 [BepInDependency("atomic.terminalapi", BepInDependency.DependencyFlags.HardDependency)]
 public class TerminalCommandFunctions : BaseUnityPlugin{
     //collection of functions that actually change the code of the game
-    internal new static ManualLogSource Logger2 { get; private set; } = null!;
+    internal static ManualLogSource Logger2 { get; private set; } = null!;
     string[] boonNames = ["ExtraLife"];
     string[] baneNames = ["HalfHealth", "OopsItsAllX", "FasterDayCycle"];
     string[] cheatNames = ["DoubleSellValue"];
